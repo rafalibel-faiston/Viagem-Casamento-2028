@@ -116,6 +116,7 @@ class OrcamentoConfig(Base):
     orcamento_total = Column(Integer, default=12000)
     renda_combinada = Column(Integer, default=5500)
     data_casamento = Column(String, default="2028-07-01")
+    destino_escolhido_id = Column(Integer, nullable=True)  # destino fechado, base do plano mensal
     updated_at = Column(
         DateTime(timezone=True), onupdate=func.now(), server_default=func.now()
     )

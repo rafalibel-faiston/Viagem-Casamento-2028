@@ -135,6 +135,7 @@ class OrcamentoOut(BaseModel):
     orcamento_total: int
     renda_combinada: int
     data_casamento: str
+    destino_escolhido_id: Optional[int] = None
 
     class Config:
         from_attributes = True
@@ -144,3 +145,8 @@ class OrcamentoIn(BaseModel):
     orcamento_total: int
     renda_combinada: int
     data_casamento: str
+
+
+class EscolhaIn(BaseModel):
+    destino_id: Optional[int] = None  # None = desfazer a escolha
+    autor: Optional[str] = None

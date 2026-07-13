@@ -21,6 +21,11 @@ def migrar_colunas_novas() -> None:
         if "criado_por" not in colunas:
             with engine.begin() as conn:
                 conn.execute(text("ALTER TABLE destinos ADD COLUMN criado_por VARCHAR"))
+    if "orcamento_config" in insp.get_table_names():
+        colunas = {c["name"] for c in insp.get_columns("orcamento_config")}
+        if "destino_escolhido_id" not in colunas:
+            with engine.begin() as conn:
+                conn.execute(text("ALTER TABLE orcamento_config ADD COLUMN destino_escolhido_id INTEGER"))
 
 
 migrar_colunas_novas()
@@ -219,9 +224,19 @@ def deletar_destino(destino_id: int, autor: str | None = None, db: Session = Dep
     destino = db.get(models.Destino, destino_id)
     if not destino:
         raise HTTPException(404, "Destino não encontrado")
+    cfg = db.query(models.OrcamentoConfig).first()
+    if cfg and cfg.destino_escolhido_id == destino_id:
+        cfg.destino_escolhido_id = None  # se era o escolhido, desfaz a escolha
     db.delete(destino)  # cascata apaga votos e custos junto
     db.commit()
     return {"ok": True}
+
+
+def _custo_total_destino(d: models.Destino) -> int:
+    detalhado = sum(c.valor for c in d.custos)
+    if detalhado > 0:
+        return detalhado
+    return d.custo_min or 0
 
 
 @app.post("/api/destinos/{destino_id}/votar", response_model=schemas.DestinoOut)
@@ -409,6 +424,29 @@ def set_orcamento(payload: schemas.OrcamentoIn, db: Session = Depends(get_db)):
     cfg.orcamento_total = payload.orcamento_total
     cfg.renda_combinada = payload.renda_combinada
     cfg.data_casamento = payload.data_casamento
+    db.commit()
+    db.refresh(cfg)
+    return cfg
+
+
+@app.put("/api/escolha", response_model=schemas.OrcamentoOut)
+def escolher_destino(payload: schemas.EscolhaIn, db: Session = Depends(get_db)):
+    """Fecha (ou desfaz) o destino da viagem. Ao escolher, o orçamento da
+    calculadora passa a usar o custo total desse destino, se ele tiver um."""
+    cfg = db.query(models.OrcamentoConfig).first()
+    if not cfg:
+        cfg = models.OrcamentoConfig()
+        db.add(cfg)
+    if payload.destino_id is None:
+        cfg.destino_escolhido_id = None
+    else:
+        destino = db.get(models.Destino, payload.destino_id)
+        if not destino:
+            raise HTTPException(404, "Destino não encontrado")
+        cfg.destino_escolhido_id = destino.id
+        total = _custo_total_destino(destino)
+        if total > 0:
+            cfg.orcamento_total = total
     db.commit()
     db.refresh(cfg)
     return cfg
