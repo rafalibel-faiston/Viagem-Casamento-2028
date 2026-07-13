@@ -31,6 +31,12 @@ app = FastAPI(title="Viagem de Casamento — Rafa & Vitória")
 # ---------------------------------------------------------------------------
 # Seed inicial (só roda se as tabelas estiverem vazias — idempotente)
 # ---------------------------------------------------------------------------
+SEED_TIERS = [
+    dict(nome="Tier 1 · Brasil", ordem=0),
+    dict(nome="Tier 2 · América do Sul", ordem=1),
+    dict(nome="Tier 3 · Esticando", ordem=2),
+]
+
 SEED_DESTINOS = [
     dict(
         tier=1, ordem=0, nome="Chapada Diamantina, BA",
@@ -93,6 +99,9 @@ SEED_CHECKLIST = [
 def seed() -> None:
     db = SessionLocal()
     try:
+        if db.query(models.Tier).count() == 0:
+            db.add_all(models.Tier(**t) for t in SEED_TIERS)
+            db.commit()
         if db.query(models.Destino).count() == 0:
             db.add_all(models.Destino(**d) for d in SEED_DESTINOS)
         if db.query(models.ChecklistItem).count() == 0:
@@ -121,6 +130,51 @@ def serialize_destino(d: models.Destino) -> schemas.DestinoOut:
         votos=[v.autor for v in d.votos],
         custos=[schemas.CustoItemOut.model_validate(c) for c in d.custos],
     )
+
+
+# ---------------------------------------------------------------------------
+# Tiers (faixas de destino) — editáveis: renomear, criar, remover, reordenar
+# ---------------------------------------------------------------------------
+@app.get("/api/tiers", response_model=list[schemas.TierOut])
+def listar_tiers(db: Session = Depends(get_db)):
+    return db.query(models.Tier).order_by(models.Tier.ordem).all()
+
+
+@app.post("/api/tiers", response_model=schemas.TierOut)
+def criar_tier(payload: schemas.TierIn, db: Session = Depends(get_db)):
+    maior_ordem = db.query(models.Tier).count()
+    tier = models.Tier(nome=payload.nome, ordem=maior_ordem)
+    db.add(tier)
+    db.commit()
+    db.refresh(tier)
+    return tier
+
+
+@app.patch("/api/tiers/{tier_id}", response_model=schemas.TierOut)
+def atualizar_tier(tier_id: int, payload: schemas.TierUpdate, db: Session = Depends(get_db)):
+    tier = db.get(models.Tier, tier_id)
+    if not tier:
+        raise HTTPException(404, "Faixa não encontrada")
+    if payload.nome is not None:
+        tier.nome = payload.nome
+    if payload.ordem is not None:
+        tier.ordem = payload.ordem
+    db.commit()
+    db.refresh(tier)
+    return tier
+
+
+@app.delete("/api/tiers/{tier_id}")
+def deletar_tier(tier_id: int, db: Session = Depends(get_db)):
+    tier = db.get(models.Tier, tier_id)
+    if not tier:
+        raise HTTPException(404, "Faixa não encontrada")
+    tem_destinos = db.query(models.Destino).filter_by(tier=tier_id).count() > 0
+    if tem_destinos:
+        raise HTTPException(400, "Mova ou remova os destinos dessa faixa antes de excluí-la")
+    db.delete(tier)
+    db.commit()
+    return {"ok": True}
 
 
 # ---------------------------------------------------------------------------

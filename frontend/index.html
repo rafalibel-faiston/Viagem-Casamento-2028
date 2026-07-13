@@ -78,6 +78,14 @@
   .tab-btn{font-weight:600; font-size:0.86rem; padding:0.65rem 1.2rem; border-radius:100px; border:1.5px solid var(--teal-700); background:transparent; color:var(--teal-800); cursor:pointer; transition:all .25s ease;}
   .tab-btn:hover{background:rgba(21,88,80,0.08);}
   .tab-btn.active{background:var(--teal-800); color:var(--cream); border-color:var(--teal-800);}
+  .tabs-actions{display:flex; align-items:center; gap:1.2rem; margin-bottom:1.2rem; flex-wrap:wrap;}
+  .tabs-actions .btn-secondary{margin-bottom:0;}
+  .edit-tiers-box{background:var(--sand); border-radius:16px; padding:1.2rem; margin-bottom:2rem; display:flex; flex-direction:column; gap:0.6rem;}
+  .edit-tier-row{display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;}
+  .edit-tier-row input[type=text]{flex:1; min-width:160px; border:1.5px solid rgba(10,55,51,0.2); border-radius:10px; padding:0.55rem 0.8rem; font-size:0.88rem; background:var(--cream); font-family:inherit; color:var(--ink);}
+  .tier-move{background:transparent; border:1.5px solid rgba(10,55,51,0.25); color:var(--teal-800); width:30px; height:30px; border-radius:8px; cursor:pointer; font-size:0.9rem; flex-shrink:0;}
+  .tier-move:disabled{opacity:0.3; cursor:not-allowed;}
+  .tier-save{background:var(--teal-800); color:var(--cream); border:none; padding:0.5rem 0.9rem; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer; flex-shrink:0;}
   .tier-panel{display:none;}
   .tier-panel.active{display:grid; grid-template-columns:repeat(auto-fit, minmax(270px,1fr)); gap:1.3rem;}
   .card{background:var(--sand); border-radius:18px; padding:1.7rem 1.6rem; position:relative; overflow:hidden; border-left:5px solid var(--coral); opacity:0; transform:translateY(14px); animation:cardIn .5s ease forwards; box-shadow:0 10px 24px -14px rgba(10,55,51,0.25); transition:transform .3s ease, box-shadow .3s ease;}
@@ -217,18 +225,14 @@
       <h2>Praia, natureza e nada de clichê</h2>
       <p>Cada um sugere os lugares que quer, os dois votam curtindo — o coração mostra quem já votou. Abre cada destino pra detalhar quanto custa passagem, hospedagem, comida e o resto.</p>
     </div>
-    <div class="tabs">
-      <button class="tab-btn active" data-tier="1">Tier 1 · Brasil</button>
-      <button class="tab-btn" data-tier="2">Tier 2 · América do Sul</button>
-      <button class="tab-btn" data-tier="3">Tier 3 · Esticando</button>
+    <div class="tabs" id="tabsWrap"></div>
+    <div class="tabs-actions">
+      <button class="btn-secondary" id="toggleAddDestino">+ sugerir um destino</button>
+      <button class="link-btn" id="toggleEditTiers">editar faixas</button>
     </div>
-    <button class="btn-secondary" id="toggleAddDestino">+ sugerir um destino</button>
+    <div class="edit-tiers-box" id="editTiersBox" style="display:none;"></div>
     <div class="add-destino-form" id="addDestinoForm" style="display:none;">
-      <select id="destTier">
-        <option value="1">Tier 1 · Brasil</option>
-        <option value="2">Tier 2 · América do Sul</option>
-        <option value="3">Tier 3 · Esticando</option>
-      </select>
+      <select id="destTier"></select>
       <input type="text" id="destNome" placeholder="Nome do destino">
       <textarea id="destDescricao" placeholder="Por que esse lugar? (curto)"></textarea>
       <input type="text" id="destDias" placeholder="Quantos dias? ex: 10 dias">
@@ -324,6 +328,9 @@ for(let i=0;i<40;i++){
 // ---------- destinos (estado, precisa existir antes do bloco de autor abaixo) ----------
 const CATEGORIAS_CUSTO = ['Passagem','Hospedagem','Alimentação','Transporte local','Passeios','Outros'];
 let destinosCache = [];
+let tiersCache = [];
+let activeTierId = null;
+let editingTiers = false;
 let openCustos = new Set();
 
 // ---------- autor ----------
@@ -349,6 +356,94 @@ async function api(path, options){
   return res.status===204 ? null : res.json();
 }
 
+// ---------- tiers ----------
+async function loadTiers(){
+  tiersCache = await api('/tiers');
+  if(!activeTierId || !tiersCache.some(t=>t.id===activeTierId)){
+    activeTierId = tiersCache.length ? tiersCache[0].id : null;
+  }
+  renderTabs();
+  renderDestTierOptions();
+  renderEditTiers();
+}
+function renderTabs(){
+  const wrap = document.getElementById('tabsWrap');
+  wrap.innerHTML = tiersCache.map(t=>
+    `<button class="tab-btn ${t.id===activeTierId?'active':''}" data-tier="${t.id}">${t.nome}</button>`
+  ).join('');
+  wrap.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeTierId = parseInt(btn.dataset.tier);
+      renderTabs();
+      renderDestinos();
+    });
+  });
+}
+function renderDestTierOptions(){
+  const sel = document.getElementById('destTier');
+  sel.innerHTML = tiersCache.map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
+  if(activeTierId) sel.value = String(activeTierId);
+}
+function renderEditTiers(){
+  const box = document.getElementById('editTiersBox');
+  if(!editingTiers){ box.style.display = 'none'; return; }
+  box.style.display = 'flex';
+  const rows = tiersCache.map((t,i)=>`
+    <div class="edit-tier-row">
+      <button class="tier-move" data-id="${t.id}" data-dir="-1" ${i===0?'disabled':''} title="mover pra esquerda">&larr;</button>
+      <button class="tier-move" data-id="${t.id}" data-dir="1" ${i===tiersCache.length-1?'disabled':''} title="mover pra direita">&rarr;</button>
+      <input type="text" class="tier-nome-input" data-id="${t.id}" value="${t.nome.replace(/"/g,'&quot;')}">
+      <button class="tier-save" data-id="${t.id}">Salvar</button>
+      <button class="link-btn danger tier-del" data-id="${t.id}">remover</button>
+    </div>`).join('');
+  box.innerHTML = rows + `
+    <div class="edit-tier-row">
+      <input type="text" id="novaTierNome" placeholder="nome da nova faixa">
+      <button class="btn-primary" id="novaTierAdd">+ adicionar faixa</button>
+    </div>`;
+  box.querySelectorAll('.tier-save').forEach(b=>b.addEventListener('click', async ()=>{
+    const id = b.dataset.id;
+    const nome = box.querySelector(`.tier-nome-input[data-id="${id}"]`).value.trim();
+    if(!nome) return;
+    await api(`/tiers/${id}`, {method:'PATCH', body: JSON.stringify({nome})});
+    await loadTiers();
+  }));
+  box.querySelectorAll('.tier-del').forEach(b=>b.addEventListener('click', async ()=>{
+    if(!confirm('Remover essa faixa?')) return;
+    try{
+      await api(`/tiers/${b.dataset.id}`, {method:'DELETE'});
+      await loadTiers();
+    }catch(e){
+      alert('Não deu pra remover: mova ou apague os destinos dessa faixa antes.');
+    }
+  }));
+  box.querySelectorAll('.tier-move').forEach(b=>b.addEventListener('click', async ()=>{
+    const id = parseInt(b.dataset.id);
+    const dir = parseInt(b.dataset.dir);
+    const idx = tiersCache.findIndex(t=>t.id===id);
+    const swapIdx = idx + dir;
+    if(swapIdx<0 || swapIdx>=tiersCache.length) return;
+    const a = tiersCache[idx], c = tiersCache[swapIdx];
+    await api(`/tiers/${a.id}`, {method:'PATCH', body: JSON.stringify({ordem: c.ordem})});
+    await api(`/tiers/${c.id}`, {method:'PATCH', body: JSON.stringify({ordem: a.ordem})});
+    await loadTiers();
+  }));
+  const addBtn = document.getElementById('novaTierAdd');
+  addBtn.addEventListener('click', async ()=>{
+    const input = document.getElementById('novaTierNome');
+    const nome = input.value.trim();
+    if(!nome) return;
+    await api('/tiers', {method:'POST', body: JSON.stringify({nome})});
+    input.value = '';
+    await loadTiers();
+  });
+}
+document.getElementById('toggleEditTiers').addEventListener('click', ()=>{
+  editingTiers = !editingTiers;
+  document.getElementById('toggleEditTiers').textContent = editingTiers ? 'fechar edição de faixas' : 'editar faixas';
+  renderEditTiers();
+});
+
 // ---------- destinos ----------
 async function loadDestinos(){
   destinosCache = await api('/destinos');
@@ -365,16 +460,16 @@ function custoLabel(d){
   return `CASAL · ${d.dias.toUpperCase()} <span>sem estimativa</span>`;
 }
 function renderDestinos(){
-  const tiers = {1:[],2:[],3:[]};
-  destinosCache.forEach(d=>tiers[d.tier].push(d));
-  const activeTier = document.querySelector('.tab-btn.active').dataset.tier;
+  const buckets = {};
+  tiersCache.forEach(t=>buckets[t.id]=[]);
+  destinosCache.forEach(d=>{ if(buckets[d.tier]) buckets[d.tier].push(d); });
   const wrap = document.getElementById('tierPanels');
   wrap.innerHTML = '';
-  [1,2,3].forEach(tier=>{
+  tiersCache.forEach(t=>{
     const panel = document.createElement('div');
-    panel.className = 'tier-panel' + (String(tier)===activeTier ? ' active' : '');
-    panel.dataset.panel = tier;
-    tiers[tier].forEach((d,i)=>{
+    panel.className = 'tier-panel' + (t.id===activeTierId ? ' active' : '');
+    panel.dataset.panel = t.id;
+    buckets[t.id].forEach((d,i)=>{
       const voted = currentAutor && d.votos.includes(currentAutor);
       const isOpen = openCustos.has(d.id);
       const total = d.custos.reduce((s,c)=>s+c.valor,0);
@@ -471,14 +566,6 @@ function renderDestinos(){
     });
   });
 }
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    renderDestinos();
-  });
-});
-
 document.getElementById('toggleAddDestino').addEventListener('click', ()=>{
   const box = document.getElementById('addDestinoForm');
   box.style.display = box.style.display==='none' ? 'flex' : 'none';
@@ -496,7 +583,8 @@ document.getElementById('destSubmit').addEventListener('click', async ()=>{
   destinosCache.push(d);
   ['destNome','destDescricao','destDias','destCustoMin','destCustoMax'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('addDestinoForm').style.display = 'none';
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tier===String(tier)));
+  activeTierId = tier;
+  renderTabs();
   renderDestinos();
 });
 
@@ -655,7 +743,10 @@ async function loadOrcamento(){
 }
 
 // ---------- boot ----------
-loadDestinos();
+(async ()=>{
+  await loadTiers();
+  await loadDestinos();
+})();
 loadMural();
 loadChecklist();
 loadOrcamento();

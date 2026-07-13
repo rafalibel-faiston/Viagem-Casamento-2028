@@ -14,6 +14,14 @@ from sqlalchemy.sql import func
 from database import Base
 
 
+class Tier(Base):
+    __tablename__ = "tiers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String, nullable=False)
+    ordem = Column(Integer, default=0)
+
+
 class Destino(Base):
     __tablename__ = "destinos"
 

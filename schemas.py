@@ -4,6 +4,24 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
+class TierOut(BaseModel):
+    id: int
+    nome: str
+    ordem: int
+
+    class Config:
+        from_attributes = True
+
+
+class TierIn(BaseModel):
+    nome: str
+
+
+class TierUpdate(BaseModel):
+    nome: Optional[str] = None
+    ordem: Optional[int] = None
+
+
 class CustoItemOut(BaseModel):
     id: int
     categoria: str
