@@ -203,6 +203,14 @@ def criar_destino(payload: schemas.DestinoIn, db: Session = Depends(get_db)):
     db.add(destino)
     db.commit()
     db.refresh(destino)
+    for categoria, valor in (payload.custos or {}).items():
+        if valor and valor > 0:
+            db.add(models.CustoItem(
+                destino_id=destino.id, categoria=categoria,
+                valor=valor, criado_por=payload.autor,
+            ))
+    db.commit()
+    db.refresh(destino)
     return serialize_destino(destino)
 
 
@@ -254,6 +262,26 @@ def criar_custo(destino_id: int, payload: schemas.CustoItemIn, db: Session = Dep
         criado_por=payload.autor,
     )
     db.add(item)
+    db.commit()
+    db.refresh(destino)
+    return serialize_destino(destino)
+
+
+@app.put("/api/destinos/{destino_id}/custos", response_model=schemas.DestinoOut)
+def salvar_custos(destino_id: int, payload: schemas.CustosMapIn, db: Session = Depends(get_db)):
+    """Substitui todos os custos do destino por um item por categoria (lista aberta)."""
+    destino = db.get(models.Destino, destino_id)
+    if not destino:
+        raise HTTPException(404, "Destino não encontrado")
+    for antigo in list(destino.custos):
+        db.delete(antigo)
+    db.flush()
+    for categoria, valor in (payload.custos or {}).items():
+        if valor and valor > 0:
+            db.add(models.CustoItem(
+                destino_id=destino_id, categoria=categoria,
+                valor=valor, criado_por=payload.autor,
+            ))
     db.commit()
     db.refresh(destino)
     return serialize_destino(destino)
