@@ -93,6 +93,32 @@
   .vote-btn svg{width:15px; height:15px;}
   .vote-btn.voted{background:var(--coral); border-color:var(--coral); color:#fff;}
   .vote-btn.voted svg{fill:#fff;}
+  .suggest-tag{display:inline-block; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--coral-dark); background:rgba(255,107,74,0.12); padding:0.25rem 0.6rem; border-radius:100px; margin-bottom:0.6rem;}
+  .card-actions{display:flex; gap:1rem; margin-top:0.9rem; flex-wrap:wrap;}
+  .link-btn{background:none; border:none; padding:0; color:var(--teal-700); font-size:0.78rem; font-weight:600; text-decoration:underline; cursor:pointer;}
+  .link-btn.danger{color:var(--coral-dark);}
+  .custos-box{margin-top:0.9rem; padding-top:0.9rem; border-top:1px dashed rgba(10,55,51,0.2);}
+  .custo-row{display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; padding:0.3rem 0; color:var(--ink-soft);}
+  .custo-row .custo-cat{font-weight:700; color:var(--teal-800); min-width:110px;}
+  .custo-row .custo-desc{flex:1; font-weight:300;}
+  .custo-row .custo-valor{font-weight:600; color:var(--ink);}
+  .custo-row .custo-del{background:none; border:none; color:var(--ink-soft); opacity:0.5; cursor:pointer; font-size:1rem; line-height:1;}
+  .custo-row .custo-del:hover{opacity:1; color:var(--coral-dark);}
+  .custos-total{font-size:0.85rem; margin-top:0.4rem; padding-top:0.4rem; border-top:1px solid rgba(10,55,51,0.12); color:var(--teal-900);}
+  .custo-form{display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.7rem;}
+  .custo-form select, .custo-form input{border:1.5px solid rgba(10,55,51,0.2); border-radius:8px; padding:0.4rem 0.6rem; font-size:0.8rem; background:var(--cream); font-family:inherit;}
+  .custo-form select{flex:1; min-width:120px;}
+  .custo-form input[type=text]{flex:1; min-width:110px;}
+  .custo-form input[type=number]{width:100px;}
+  .custo-form button{background:var(--teal-800); color:var(--cream); border:none; padding:0 0.8rem; border-radius:8px; font-size:0.8rem; cursor:pointer;}
+
+  /* ===== SUGERIR DESTINO ===== */
+  .btn-secondary{background:transparent; border:1.5px solid var(--teal-700); color:var(--teal-800); padding:0.6rem 1.2rem; border-radius:100px; font-size:0.86rem; font-weight:600; cursor:pointer; margin-bottom:1.4rem;}
+  .btn-secondary:hover{background:rgba(21,88,80,0.08);}
+  .add-destino-form{background:var(--sand); border-radius:18px; padding:1.4rem; margin-bottom:2rem; display:flex; flex-direction:column; gap:0.7rem;}
+  .add-destino-form select, .add-destino-form input, .add-destino-form textarea{border:1.5px solid rgba(10,55,51,0.2); border-radius:10px; padding:0.65rem 0.9rem; font-size:0.9rem; background:var(--cream); font-family:inherit; color:var(--ink); width:100%;}
+  .add-destino-form textarea{min-height:70px; resize:vertical;}
+  .add-destino-row{display:flex; gap:0.7rem;}
 
   /* ===== MURAL ===== */
   .mural-form{background:var(--sand); border-radius:18px; padding:1.4rem; margin-bottom:2rem; display:flex; gap:0.8rem; flex-wrap:wrap;}
@@ -189,12 +215,28 @@
     <div class="section-head">
       <span class="tag">Destinos fora do óbvio</span>
       <h2>Praia, natureza e nada de clichê</h2>
-      <p>Vota no que mais curtir — o coração fica marcado com quem já votou. Três faixas de orçamento, todas fugindo do circuito batido.</p>
+      <p>Cada um sugere os lugares que quer, os dois votam curtindo — o coração mostra quem já votou. Abre cada destino pra detalhar quanto custa passagem, hospedagem, comida e o resto.</p>
     </div>
     <div class="tabs">
       <button class="tab-btn active" data-tier="1">Tier 1 · Brasil</button>
       <button class="tab-btn" data-tier="2">Tier 2 · América do Sul</button>
       <button class="tab-btn" data-tier="3">Tier 3 · Esticando</button>
+    </div>
+    <button class="btn-secondary" id="toggleAddDestino">+ sugerir um destino</button>
+    <div class="add-destino-form" id="addDestinoForm" style="display:none;">
+      <select id="destTier">
+        <option value="1">Tier 1 · Brasil</option>
+        <option value="2">Tier 2 · América do Sul</option>
+        <option value="3">Tier 3 · Esticando</option>
+      </select>
+      <input type="text" id="destNome" placeholder="Nome do destino">
+      <textarea id="destDescricao" placeholder="Por que esse lugar? (curto)"></textarea>
+      <input type="text" id="destDias" placeholder="Quantos dias? ex: 10 dias">
+      <div class="add-destino-row">
+        <input type="number" id="destCustoMin" placeholder="Custo mín. estimado (R$, opcional)">
+        <input type="number" id="destCustoMax" placeholder="Custo máx. estimado (R$, opcional)">
+      </div>
+      <button class="btn-primary" id="destSubmit">Adicionar destino</button>
     </div>
     <div id="tierPanels"></div>
   </div>
@@ -303,10 +345,22 @@ async function api(path, options){
 }
 
 // ---------- destinos ----------
+const CATEGORIAS_CUSTO = ['Passagem','Hospedagem','Alimentação','Transporte local','Passeios','Outros'];
 let destinosCache = [];
+let openCustos = new Set();
 async function loadDestinos(){
   destinosCache = await api('/destinos');
   renderDestinos();
+}
+function custoLabel(d){
+  const total = d.custos.reduce((s,c)=>s+c.valor,0);
+  if(d.custos.length>0){
+    return `CASAL · ${d.dias.toUpperCase()} <span>R$ ${total.toLocaleString('pt-BR')}</span>`;
+  }
+  if(d.custo_min>0 || d.custo_max>0){
+    return `CASAL · ${d.dias.toUpperCase()} <span>R$ ${d.custo_min.toLocaleString('pt-BR')}–${d.custo_max.toLocaleString('pt-BR')}</span>`;
+  }
+  return `CASAL · ${d.dias.toUpperCase()} <span>sem estimativa</span>`;
 }
 function renderDestinos(){
   const tiers = {1:[],2:[],3:[]};
@@ -320,18 +374,45 @@ function renderDestinos(){
     panel.dataset.panel = tier;
     tiers[tier].forEach((d,i)=>{
       const voted = currentAutor && d.votos.includes(currentAutor);
+      const isOpen = openCustos.has(d.id);
+      const total = d.custos.reduce((s,c)=>s+c.valor,0);
       const card = document.createElement('div');
       card.className = 'card';
       card.style.animationDelay = (i*0.08)+'s';
       card.innerHTML = `
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">${ICONS[d.icon_key]||ICONS.wave}</svg>
+        ${d.criado_por ? `<span class="suggest-tag">sugestão de ${d.criado_por}</span>` : ''}
         <h3>${d.nome}</h3>
         <p>${d.descricao}</p>
         <div class="card-foot">
-          <div class="cost">CASAL · ${d.dias.toUpperCase()} <span>R$ ${d.custo_min.toLocaleString('pt-BR')}–${d.custo_max.toLocaleString('pt-BR')}</span></div>
+          <div class="cost">${custoLabel(d)}</div>
           <button class="vote-btn ${voted?'voted':''}" data-id="${d.id}" ${currentAutor?'':'disabled title="escolha quem você é"'}>
             <svg viewBox="0 0 24 24">${HEART}</svg> ${d.votos.length}
           </button>
+        </div>
+        <div class="card-actions">
+          <button class="link-btn custos-toggle" data-id="${d.id}">${isOpen ? 'esconder custos' : 'detalhar custos'}</button>
+          ${d.criado_por && d.criado_por===currentAutor ? `<button class="link-btn danger del-destino" data-id="${d.id}">remover sugestão</button>` : ''}
+        </div>
+        <div class="custos-box" id="custos-${d.id}" style="display:${isOpen ? 'block' : 'none'};">
+          <div class="custos-list">
+            ${d.custos.map(c=>`
+              <div class="custo-row">
+                <span class="custo-cat">${c.categoria}</span>
+                <span class="custo-desc">${c.descricao || ''}</span>
+                <span class="custo-valor">R$ ${c.valor.toLocaleString('pt-BR')}</span>
+                <button class="custo-del" data-destino="${d.id}" data-item="${c.id}" title="remover">×</button>
+              </div>`).join('') || '<p class="empty-hint" style="font-size:0.82rem;">Nenhum custo detalhado ainda.</p>'}
+          </div>
+          ${d.custos.length>0 ? `<div class="custos-total">Total detalhado: <b>R$ ${total.toLocaleString('pt-BR')}</b></div>` : ''}
+          <div class="custo-form">
+            <select class="custo-categoria" data-id="${d.id}">
+              ${CATEGORIAS_CUSTO.map(c=>`<option value="${c}">${c}</option>`).join('')}
+            </select>
+            <input type="text" class="custo-descricao" data-id="${d.id}" placeholder="descrição (opcional)">
+            <input type="number" class="custo-valor" data-id="${d.id}" placeholder="valor R$">
+            <button class="custo-add" data-id="${d.id}" ${currentAutor?'':'disabled title="escolha quem você é"'}>Adicionar</button>
+          </div>
         </div>`;
       panel.appendChild(card);
     });
@@ -346,6 +427,47 @@ function renderDestinos(){
       renderDestinos();
     });
   });
+  wrap.querySelectorAll('.custos-toggle').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = parseInt(btn.dataset.id);
+      if(openCustos.has(id)) openCustos.delete(id); else openCustos.add(id);
+      renderDestinos();
+    });
+  });
+  wrap.querySelectorAll('.del-destino').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(!currentAutor) return;
+      if(!confirm('Remover essa sugestão de destino?')) return;
+      await api(`/destinos/${btn.dataset.id}?autor=${encodeURIComponent(currentAutor)}`, {method:'DELETE'});
+      destinosCache = destinosCache.filter(x=>x.id!==parseInt(btn.dataset.id));
+      renderDestinos();
+    });
+  });
+  wrap.querySelectorAll('.custo-add').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(!currentAutor) return;
+      const id = btn.dataset.id;
+      const categoria = wrap.querySelector(`.custo-categoria[data-id="${id}"]`).value;
+      const descricao = wrap.querySelector(`.custo-descricao[data-id="${id}"]`).value.trim();
+      const valorInput = wrap.querySelector(`.custo-valor[data-id="${id}"]`);
+      const valor = parseInt(valorInput.value);
+      if(!valor || valor<=0){ alert('Coloca um valor válido em R$'); return; }
+      openCustos.add(parseInt(id));
+      const d = await api(`/destinos/${id}/custos`, {method:'POST', body: JSON.stringify({categoria, descricao: descricao || null, valor, autor: currentAutor})});
+      const idx = destinosCache.findIndex(x=>x.id===d.id);
+      destinosCache[idx] = d;
+      renderDestinos();
+    });
+  });
+  wrap.querySelectorAll('.custo-del').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      openCustos.add(parseInt(btn.dataset.destino));
+      const d = await api(`/destinos/${btn.dataset.destino}/custos/${btn.dataset.item}`, {method:'DELETE'});
+      const idx = destinosCache.findIndex(x=>x.id===d.id);
+      destinosCache[idx] = d;
+      renderDestinos();
+    });
+  });
 }
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -353,6 +475,27 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.classList.add('active');
     renderDestinos();
   });
+});
+
+document.getElementById('toggleAddDestino').addEventListener('click', ()=>{
+  const box = document.getElementById('addDestinoForm');
+  box.style.display = box.style.display==='none' ? 'flex' : 'none';
+});
+document.getElementById('destSubmit').addEventListener('click', async ()=>{
+  if(!currentAutor){ alert('Escolhe quem você é lá em cima primeiro'); return; }
+  const tier = parseInt(document.getElementById('destTier').value);
+  const nome = document.getElementById('destNome').value.trim();
+  const descricao = document.getElementById('destDescricao').value.trim();
+  const dias = document.getElementById('destDias').value.trim();
+  const custo_min = parseInt(document.getElementById('destCustoMin').value) || 0;
+  const custo_max = parseInt(document.getElementById('destCustoMax').value) || 0;
+  if(!nome || !descricao || !dias){ alert('Preenche pelo menos nome, descrição e duração'); return; }
+  const d = await api('/destinos', {method:'POST', body: JSON.stringify({tier, nome, descricao, dias, custo_min, custo_max, autor: currentAutor})});
+  destinosCache.push(d);
+  ['destNome','destDescricao','destDias','destCustoMin','destCustoMax'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('addDestinoForm').style.display = 'none';
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tier===String(tier)));
+  renderDestinos();
 });
 
 // ---------- mural ----------

@@ -26,9 +26,13 @@ class Destino(Base):
     dias = Column(String, nullable=False)
     icon_key = Column(String, nullable=False, default="wave")
     ordem = Column(Integer, default=0)
+    criado_por = Column(String, nullable=True)  # None = destino original da lista inicial
 
     votos = relationship(
         "VotoDestino", back_populates="destino", cascade="all, delete-orphan"
+    )
+    custos = relationship(
+        "CustoItem", back_populates="destino", cascade="all, delete-orphan"
     )
 
 
@@ -45,6 +49,20 @@ class VotoDestino(Base):
     __table_args__ = (
         UniqueConstraint("destino_id", "autor", name="uq_voto_destino_autor"),
     )
+
+
+class CustoItem(Base):
+    __tablename__ = "custo_itens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    destino_id = Column(Integer, ForeignKey("destinos.id"), nullable=False)
+    categoria = Column(String, nullable=False)
+    descricao = Column(String, nullable=True)
+    valor = Column(Integer, nullable=False)
+    criado_por = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    destino = relationship("Destino", back_populates="custos")
 
 
 class MuralItem(Base):
