@@ -4,6 +4,24 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
+class CustoItemOut(BaseModel):
+    id: int
+    categoria: str
+    descricao: Optional[str] = None
+    valor: int
+    criado_por: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class CustoItemIn(BaseModel):
+    categoria: str
+    descricao: Optional[str] = None
+    valor: int
+    autor: Optional[str] = None
+
+
 class DestinoOut(BaseModel):
     id: int
     tier: int
@@ -13,10 +31,23 @@ class DestinoOut(BaseModel):
     custo_max: int
     dias: str
     icon_key: str
+    criado_por: Optional[str] = None
     votos: List[str] = []
+    custos: List[CustoItemOut] = []
 
     class Config:
         from_attributes = True
+
+
+class DestinoIn(BaseModel):
+    tier: int
+    nome: str
+    descricao: str
+    dias: str
+    icon_key: str = "wave"
+    custo_min: int = 0
+    custo_max: int = 0
+    autor: str
 
 
 class VotarIn(BaseModel):

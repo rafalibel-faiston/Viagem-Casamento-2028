@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 
 import models
@@ -7,6 +8,22 @@ import schemas
 from database import Base, SessionLocal, engine, get_db
 
 Base.metadata.create_all(bind=engine)
+
+
+# ---------------------------------------------------------------------------
+# Migração leve: adiciona colunas novas em tabelas que já existiam antes
+# dessa versão (sem Alembic, create_all não altera tabelas já criadas).
+# ---------------------------------------------------------------------------
+def migrar_colunas_novas() -> None:
+    insp = inspect(engine)
+    if "destinos" in insp.get_table_names():
+        colunas = {c["name"] for c in insp.get_columns("destinos")}
+        if "criado_por" not in colunas:
+            with engine.begin() as conn:
+                conn.execute(text("ALTER TABLE destinos ADD COLUMN criado_por VARCHAR"))
+
+
+migrar_colunas_novas()
 
 app = FastAPI(title="Viagem de Casamento — Rafa & Vitória")
 
@@ -100,7 +117,9 @@ def serialize_destino(d: models.Destino) -> schemas.DestinoOut:
         custo_max=d.custo_max,
         dias=d.dias,
         icon_key=d.icon_key,
+        criado_por=d.criado_por,
         votos=[v.autor for v in d.votos],
+        custos=[schemas.CustoItemOut.model_validate(c) for c in d.custos],
     )
 
 
@@ -111,6 +130,38 @@ def serialize_destino(d: models.Destino) -> schemas.DestinoOut:
 def listar_destinos(db: Session = Depends(get_db)):
     destinos = db.query(models.Destino).order_by(models.Destino.tier, models.Destino.ordem).all()
     return [serialize_destino(d) for d in destinos]
+
+
+@app.post("/api/destinos", response_model=schemas.DestinoOut)
+def criar_destino(payload: schemas.DestinoIn, db: Session = Depends(get_db)):
+    maior_ordem = db.query(models.Destino).filter_by(tier=payload.tier).count()
+    destino = models.Destino(
+        tier=payload.tier,
+        nome=payload.nome,
+        descricao=payload.descricao,
+        dias=payload.dias,
+        icon_key=payload.icon_key,
+        custo_min=payload.custo_min,
+        custo_max=payload.custo_max,
+        criado_por=payload.autor,
+        ordem=maior_ordem,
+    )
+    db.add(destino)
+    db.commit()
+    db.refresh(destino)
+    return serialize_destino(destino)
+
+
+@app.delete("/api/destinos/{destino_id}")
+def deletar_destino(destino_id: int, autor: str, db: Session = Depends(get_db)):
+    destino = db.get(models.Destino, destino_id)
+    if not destino:
+        raise HTTPException(404, "Destino não encontrado")
+    if destino.criado_por != autor:
+        raise HTTPException(403, "Só quem sugeriu esse destino pode removê-lo")
+    db.delete(destino)
+    db.commit()
+    return {"ok": True}
 
 
 @app.post("/api/destinos/{destino_id}/votar", response_model=schemas.DestinoOut)
@@ -129,6 +180,39 @@ def votar_destino(destino_id: int, payload: schemas.VotarIn, db: Session = Depen
     else:
         db.add(models.VotoDestino(destino_id=destino_id, autor=payload.autor))
     db.commit()
+    db.refresh(destino)
+    return serialize_destino(destino)
+
+
+# ---------------------------------------------------------------------------
+# Custos por destino (passagem, hospedagem, comida, etc.)
+# ---------------------------------------------------------------------------
+@app.post("/api/destinos/{destino_id}/custos", response_model=schemas.DestinoOut)
+def criar_custo(destino_id: int, payload: schemas.CustoItemIn, db: Session = Depends(get_db)):
+    destino = db.get(models.Destino, destino_id)
+    if not destino:
+        raise HTTPException(404, "Destino não encontrado")
+    item = models.CustoItem(
+        destino_id=destino_id,
+        categoria=payload.categoria,
+        descricao=payload.descricao,
+        valor=payload.valor,
+        criado_por=payload.autor,
+    )
+    db.add(item)
+    db.commit()
+    db.refresh(destino)
+    return serialize_destino(destino)
+
+
+@app.delete("/api/destinos/{destino_id}/custos/{item_id}", response_model=schemas.DestinoOut)
+def deletar_custo(destino_id: int, item_id: int, db: Session = Depends(get_db)):
+    item = db.get(models.CustoItem, item_id)
+    if not item or item.destino_id != destino_id:
+        raise HTTPException(404, "Item de custo não encontrado")
+    db.delete(item)
+    db.commit()
+    destino = db.get(models.Destino, destino_id)
     db.refresh(destino)
     return serialize_destino(destino)
 
