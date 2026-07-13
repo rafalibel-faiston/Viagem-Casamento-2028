@@ -73,6 +73,19 @@
   .section-head h2{font-size:clamp(1.9rem, 4vw, 2.7rem); color:var(--teal-900);}
   .section-head p{margin-top:1rem; color:var(--ink-soft); font-size:1.02rem; line-height:1.6; font-weight:300;}
 
+  /* ===== RANKING / QUEM ESTÁ GANHANDO ===== */
+  .ranking{display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;}
+  .rank-card{background:linear-gradient(135deg, var(--teal-800), var(--teal-900)); color:var(--cream); border-radius:16px; padding:1.2rem 1.4rem; display:flex; align-items:center; gap:1rem; box-shadow:0 10px 24px -14px rgba(10,55,51,0.5);}
+  .rank-card.price{background:linear-gradient(135deg, #c9502f, var(--coral-dark));}
+  .rank-emoji{font-size:1.9rem; line-height:1; flex-shrink:0;}
+  .rank-body{min-width:0;}
+  .rank-label{font-size:0.66rem; text-transform:uppercase; letter-spacing:0.14em; opacity:0.8; font-weight:600;}
+  .rank-nome{font-family:'Fraunces',serif; font-size:1.15rem; font-weight:600; margin:0.15rem 0; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .rank-meta{font-size:0.82rem; opacity:0.92;}
+  .rank-meta b{color:var(--gold); font-weight:700;}
+  .rank-card.price .rank-meta b{color:#ffe1c2;}
+  .rank-empty{grid-column:1/-1; background:var(--sand); border-radius:16px; padding:1.1rem 1.4rem; font-size:0.9rem; color:var(--ink-soft); font-style:italic; text-align:center;}
+
   /* ===== DESTINOS ===== */
   .tabs{display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:2.2rem;}
   .tab-btn{font-weight:600; font-size:0.86rem; padding:0.65rem 1.2rem; border-radius:100px; border:1.5px solid var(--teal-700); background:transparent; color:var(--teal-800); cursor:pointer; transition:all .25s ease;}
@@ -226,6 +239,10 @@
 
     .section-head{margin-bottom:2rem;}
 
+    /* ranking empilhado */
+    .ranking{grid-template-columns:1fr; gap:0.7rem; margin-bottom:1.6rem;}
+    .rank-card{padding:1rem 1.1rem;}
+
     /* destinos: sempre uma coluna, cartão respira melhor */
     .tier-panel.active{grid-template-columns:1fr; gap:1rem;}
     .card{padding:1.4rem 1.3rem;}
@@ -290,6 +307,7 @@
       <h2>Praia, natureza e nada de clichê</h2>
       <p>Cada um sugere os lugares que quer, os dois votam curtindo — o coração mostra quem já votou. Abre cada destino pra detalhar quanto custa passagem, hospedagem, comida e o resto.</p>
     </div>
+    <div class="ranking" id="ranking"></div>
     <div class="tabs" id="tabsWrap"></div>
     <div class="tabs-actions">
       <button class="btn-secondary" id="toggleAddDestino">+ sugerir um destino</button>
@@ -521,6 +539,50 @@ function custoLabel(d){
   }
   return `CASAL · ${d.dias.toUpperCase()} <span>sem estimativa</span>`;
 }
+// custo total efetivo de um destino: soma detalhada, ou estimativa mínima, ou 0
+function custoTotal(d){
+  if(d.custos.length>0) return d.custos.reduce((s,c)=>s+c.valor,0);
+  if(d.custo_min>0) return d.custo_min;
+  return 0;
+}
+// resumo rápido: quem está ganhando em curtidas e quem está mais barato
+function renderRanking(){
+  const el = document.getElementById('ranking');
+  if(!el) return;
+  if(destinosCache.length===0){ el.innerHTML=''; return; }
+  const comVotos = destinosCache.filter(d=>d.votos.length>0);
+  const comPreco = destinosCache.filter(d=>custoTotal(d)>0);
+  let html = '';
+  if(comVotos.length){
+    const top = comVotos.reduce((a,b)=> b.votos.length>a.votos.length ? b : a);
+    const n = top.votos.length;
+    html += `
+      <div class="rank-card">
+        <div class="rank-emoji">🏆</div>
+        <div class="rank-body">
+          <div class="rank-label">Mais curtido</div>
+          <div class="rank-nome">${top.nome}</div>
+          <div class="rank-meta"><b>${n} ${n===1?'curtida':'curtidas'}</b> · ${top.votos.join(' e ')}</div>
+        </div>
+      </div>`;
+  }
+  if(comPreco.length){
+    const barato = comPreco.reduce((a,b)=> custoTotal(b)<custoTotal(a) ? b : a);
+    html += `
+      <div class="rank-card price">
+        <div class="rank-emoji">💰</div>
+        <div class="rank-body">
+          <div class="rank-label">Mais em conta</div>
+          <div class="rank-nome">${barato.nome}</div>
+          <div class="rank-meta"><b>R$ ${custoTotal(barato).toLocaleString('pt-BR')}</b> pro casal</div>
+        </div>
+      </div>`;
+  }
+  if(!html){
+    html = '<div class="rank-empty">Curta os destinos e coloque os preços pra ver aqui quem está ganhando 👀</div>';
+  }
+  el.innerHTML = html;
+}
 // Lista aberta: uma linha por categoria, campo de valor já visível (sem dropdown).
 function custoRowsHTML(prefix, valoresPorCategoria){
   return CATEGORIAS_CUSTO.map(cat=>{
@@ -580,6 +642,7 @@ function renderDestinos(){
     });
     wrap.appendChild(panel);
   });
+  renderRanking();
   wrap.querySelectorAll('.vote-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       if(!currentAutor) return;
