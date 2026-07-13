@@ -73,11 +73,32 @@
   .section-head h2{font-size:clamp(1.9rem, 4vw, 2.7rem); color:var(--teal-900);}
   .section-head p{margin-top:1rem; color:var(--ink-soft); font-size:1.02rem; line-height:1.6; font-weight:300;}
 
+  /* ===== RANKING / QUEM ESTÁ GANHANDO ===== */
+  .ranking{display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;}
+  .rank-card{background:linear-gradient(135deg, var(--teal-800), var(--teal-900)); color:var(--cream); border-radius:16px; padding:1.2rem 1.4rem; display:flex; align-items:center; gap:1rem; box-shadow:0 10px 24px -14px rgba(10,55,51,0.5);}
+  .rank-card.price{background:linear-gradient(135deg, #c9502f, var(--coral-dark));}
+  .rank-emoji{font-size:1.9rem; line-height:1; flex-shrink:0;}
+  .rank-body{min-width:0;}
+  .rank-label{font-size:0.66rem; text-transform:uppercase; letter-spacing:0.14em; opacity:0.8; font-weight:600;}
+  .rank-nome{font-family:'Fraunces',serif; font-size:1.15rem; font-weight:600; margin:0.15rem 0; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .rank-meta{font-size:0.82rem; opacity:0.92;}
+  .rank-meta b{color:var(--gold); font-weight:700;}
+  .rank-card.price .rank-meta b{color:#ffe1c2;}
+  .rank-empty{grid-column:1/-1; background:var(--sand); border-radius:16px; padding:1.1rem 1.4rem; font-size:0.9rem; color:var(--ink-soft); font-style:italic; text-align:center;}
+
   /* ===== DESTINOS ===== */
   .tabs{display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:2.2rem;}
   .tab-btn{font-weight:600; font-size:0.86rem; padding:0.65rem 1.2rem; border-radius:100px; border:1.5px solid var(--teal-700); background:transparent; color:var(--teal-800); cursor:pointer; transition:all .25s ease;}
   .tab-btn:hover{background:rgba(21,88,80,0.08);}
   .tab-btn.active{background:var(--teal-800); color:var(--cream); border-color:var(--teal-800);}
+  .tabs-actions{display:flex; align-items:center; gap:1.2rem; margin-bottom:1.2rem; flex-wrap:wrap;}
+  .tabs-actions .btn-secondary{margin-bottom:0;}
+  .edit-tiers-box{background:var(--sand); border-radius:16px; padding:1.2rem; margin-bottom:2rem; display:flex; flex-direction:column; gap:0.6rem;}
+  .edit-tier-row{display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;}
+  .edit-tier-row input[type=text]{flex:1; min-width:160px; border:1.5px solid rgba(10,55,51,0.2); border-radius:10px; padding:0.55rem 0.8rem; font-size:0.88rem; background:var(--cream); font-family:inherit; color:var(--ink);}
+  .tier-move{background:transparent; border:1.5px solid rgba(10,55,51,0.25); color:var(--teal-800); width:30px; height:30px; border-radius:8px; cursor:pointer; font-size:0.9rem; flex-shrink:0;}
+  .tier-move:disabled{opacity:0.3; cursor:not-allowed;}
+  .tier-save{background:var(--teal-800); color:var(--cream); border:none; padding:0.5rem 0.9rem; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer; flex-shrink:0;}
   .tier-panel{display:none;}
   .tier-panel.active{display:grid; grid-template-columns:repeat(auto-fit, minmax(270px,1fr)); gap:1.3rem;}
   .card{background:var(--sand); border-radius:18px; padding:1.7rem 1.6rem; position:relative; overflow:hidden; border-left:5px solid var(--coral); opacity:0; transform:translateY(14px); animation:cardIn .5s ease forwards; box-shadow:0 10px 24px -14px rgba(10,55,51,0.25); transition:transform .3s ease, box-shadow .3s ease;}
@@ -104,13 +125,24 @@
   .custo-row .custo-valor{font-weight:600; color:var(--ink);}
   .custo-row .custo-del{background:none; border:none; color:var(--ink-soft); opacity:0.5; cursor:pointer; font-size:1rem; line-height:1;}
   .custo-row .custo-del:hover{opacity:1; color:var(--coral-dark);}
-  .custos-total{font-size:0.85rem; margin-top:0.4rem; padding-top:0.4rem; border-top:1px solid rgba(10,55,51,0.12); color:var(--teal-900);}
-  .custo-form{display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.7rem;}
-  .custo-form select, .custo-form input{border:1.5px solid rgba(10,55,51,0.2); border-radius:8px; padding:0.4rem 0.6rem; font-size:0.8rem; background:var(--cream); font-family:inherit;}
-  .custo-form select{flex:1; min-width:120px;}
-  .custo-form input[type=text]{flex:1; min-width:110px;}
-  .custo-form input[type=number]{width:100px;}
-  .custo-form button{background:var(--teal-800); color:var(--cream); border:none; padding:0 0.8rem; border-radius:8px; font-size:0.8rem; cursor:pointer;}
+  .custos-total{font-size:0.9rem; margin-top:0.6rem; padding-top:0.5rem; border-top:1px solid rgba(10,55,51,0.12); color:var(--teal-900); display:flex; justify-content:space-between; align-items:center;}
+  .custos-total b{font-family:'Fraunces',serif; color:var(--coral-dark); font-size:1.05rem;}
+
+  /* ===== LISTA ABERTA DE CUSTOS (nova, sem dropdown) ===== */
+  .custo-open{display:flex; flex-direction:column; gap:0.5rem; margin-top:0.6rem;}
+  .custo-open-title{font-size:0.7rem; text-transform:uppercase; letter-spacing:0.09em; font-weight:700; color:var(--teal-800);}
+  .custo-open-row{display:flex; align-items:center; gap:0.7rem;}
+  .custo-open-row label{flex:1; font-size:0.88rem; font-weight:600; color:var(--ink-soft);}
+  .money-field{display:flex; align-items:center; gap:4px; background:var(--cream); border:1.5px solid rgba(10,55,51,0.2); border-radius:9px; padding:0 0.6rem; min-width:118px;}
+  .money-field:focus-within{border-color:var(--teal-500);}
+  .money-field .sym{font-size:0.8rem; color:var(--ink-soft); font-weight:600;}
+  .money-field input[type=number]{width:100%; border:none; background:transparent; padding:0.5rem 0; font-size:0.9rem; font-family:inherit; color:var(--ink); outline:none; -moz-appearance:textfield;}
+  .money-field input[type=number]::-webkit-outer-spin-button,
+  .money-field input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none; margin:0;}
+  .custo-save{background:var(--teal-800); color:var(--cream); border:none; padding:0.6rem 1.1rem; border-radius:10px; font-size:0.84rem; font-weight:600; cursor:pointer; margin-top:0.3rem; align-self:flex-start;}
+  .custo-save:hover{background:var(--teal-900);}
+  .custo-saved-hint{font-size:0.74rem; color:var(--teal-700); font-weight:600; opacity:0; transition:opacity .2s;}
+  .custo-saved-hint.show{opacity:1;}
 
   /* ===== SUGERIR DESTINO ===== */
   .btn-secondary{background:transparent; border:1.5px solid var(--teal-700); color:var(--teal-800); padding:0.6rem 1.2rem; border-radius:100px; font-size:0.86rem; font-weight:600; cursor:pointer; margin-bottom:1.4rem;}
@@ -187,6 +219,64 @@
 
   .loading-dot{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--coral); animation:blink 1s infinite;}
   @keyframes blink{0%,100%{opacity:0.2;}50%{opacity:1;}}
+
+  /* ===================================================================
+     MOBILE — telas até 640px
+     =================================================================== */
+  @media(max-width:640px){
+    :root{font-size:15px;}
+    section{padding:3.4rem 1.05rem;}
+
+    /* barra de autor: compacta, sem ocupar meia tela */
+    .autor-bar{padding:0.55rem 0.75rem; gap:5px; border-bottom-left-radius:14px;}
+    .autor-bar span{display:none;}
+    .autor-btn{padding:0.45rem 0.9rem; font-size:0.85rem;}
+
+    /* hero */
+    .hero{min-height:88vh; padding:1.5rem 1.2rem;}
+    .eyebrow{letter-spacing:0.22em; font-size:0.62rem; margin-bottom:1rem;}
+    .sun{width:120px; height:120px; top:11%;}
+
+    .section-head{margin-bottom:2rem;}
+
+    /* ranking empilhado */
+    .ranking{grid-template-columns:1fr; gap:0.7rem; margin-bottom:1.6rem;}
+    .rank-card{padding:1rem 1.1rem;}
+
+    /* destinos: sempre uma coluna, cartão respira melhor */
+    .tier-panel.active{grid-template-columns:1fr; gap:1rem;}
+    .card{padding:1.4rem 1.3rem;}
+    .card-foot{gap:0.5rem;}
+    .cost{font-size:0.72rem;}
+
+    /* tabs e ações roláveis / empilhadas */
+    .tabs{gap:0.45rem;}
+    .tab-btn{font-size:0.8rem; padding:0.6rem 1rem;}
+    .tabs-actions{gap:0.9rem;}
+
+    /* formulários empilham de vez */
+    .add-destino-row{flex-direction:column; gap:0.7rem;}
+    .edit-tier-row{gap:0.4rem;}
+    .edit-tier-row input[type=text]{min-width:0; flex-basis:100%; order:-1;}
+
+    /* lista aberta de custos: label em cima, campo largo */
+    .custo-open-row{gap:0.5rem;}
+    .custo-open-row label{font-size:0.85rem;}
+    .money-field{min-width:105px;}
+
+    /* mural / comentários */
+    .mural-form{padding:1.1rem; gap:0.7rem;}
+    .btn-primary{padding:0.7rem 1.2rem;}
+    .comment-form{flex-wrap:wrap;}
+    .comment-form input{min-width:0; flex-basis:100%;}
+
+    /* calculadora */
+    .calc-box{padding:1.5rem; gap:1.6rem; border-radius:18px;}
+
+    /* checklist */
+    .checklist-form{flex-direction:column;}
+    .checklist-form .btn-primary{padding:0.75rem;}
+  }
 </style>
 </head>
 <body>
@@ -217,25 +307,19 @@
       <h2>Praia, natureza e nada de clichê</h2>
       <p>Cada um sugere os lugares que quer, os dois votam curtindo — o coração mostra quem já votou. Abre cada destino pra detalhar quanto custa passagem, hospedagem, comida e o resto.</p>
     </div>
-    <div class="tabs">
-      <button class="tab-btn active" data-tier="1">Tier 1 · Brasil</button>
-      <button class="tab-btn" data-tier="2">Tier 2 · América do Sul</button>
-      <button class="tab-btn" data-tier="3">Tier 3 · Esticando</button>
+    <div class="ranking" id="ranking"></div>
+    <div class="tabs" id="tabsWrap"></div>
+    <div class="tabs-actions">
+      <button class="btn-secondary" id="toggleAddDestino">+ sugerir um destino</button>
+      <button class="link-btn" id="toggleEditTiers">editar faixas</button>
     </div>
-    <button class="btn-secondary" id="toggleAddDestino">+ sugerir um destino</button>
+    <div class="edit-tiers-box" id="editTiersBox" style="display:none;"></div>
     <div class="add-destino-form" id="addDestinoForm" style="display:none;">
-      <select id="destTier">
-        <option value="1">Tier 1 · Brasil</option>
-        <option value="2">Tier 2 · América do Sul</option>
-        <option value="3">Tier 3 · Esticando</option>
-      </select>
+      <select id="destTier"></select>
       <input type="text" id="destNome" placeholder="Nome do destino">
       <textarea id="destDescricao" placeholder="Por que esse lugar? (curto)"></textarea>
       <input type="text" id="destDias" placeholder="Quantos dias? ex: 10 dias">
-      <div class="add-destino-row">
-        <input type="number" id="destCustoMin" placeholder="Custo mín. estimado (R$, opcional)">
-        <input type="number" id="destCustoMax" placeholder="Custo máx. estimado (R$, opcional)">
-      </div>
+      <div class="custo-open" id="novoDestinoCustos"></div>
       <button class="btn-primary" id="destSubmit">Adicionar destino</button>
     </div>
     <div id="tierPanels"></div>
@@ -324,6 +408,9 @@ for(let i=0;i<40;i++){
 // ---------- destinos (estado, precisa existir antes do bloco de autor abaixo) ----------
 const CATEGORIAS_CUSTO = ['Passagem','Hospedagem','Alimentação','Transporte local','Passeios','Outros'];
 let destinosCache = [];
+let tiersCache = [];
+let activeTierId = null;
+let editingTiers = false;
 let openCustos = new Set();
 
 // ---------- autor ----------
@@ -349,6 +436,94 @@ async function api(path, options){
   return res.status===204 ? null : res.json();
 }
 
+// ---------- tiers ----------
+async function loadTiers(){
+  tiersCache = await api('/tiers');
+  if(!activeTierId || !tiersCache.some(t=>t.id===activeTierId)){
+    activeTierId = tiersCache.length ? tiersCache[0].id : null;
+  }
+  renderTabs();
+  renderDestTierOptions();
+  renderEditTiers();
+}
+function renderTabs(){
+  const wrap = document.getElementById('tabsWrap');
+  wrap.innerHTML = tiersCache.map(t=>
+    `<button class="tab-btn ${t.id===activeTierId?'active':''}" data-tier="${t.id}">${t.nome}</button>`
+  ).join('');
+  wrap.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeTierId = parseInt(btn.dataset.tier);
+      renderTabs();
+      renderDestinos();
+    });
+  });
+}
+function renderDestTierOptions(){
+  const sel = document.getElementById('destTier');
+  sel.innerHTML = tiersCache.map(t=>`<option value="${t.id}">${t.nome}</option>`).join('');
+  if(activeTierId) sel.value = String(activeTierId);
+}
+function renderEditTiers(){
+  const box = document.getElementById('editTiersBox');
+  if(!editingTiers){ box.style.display = 'none'; return; }
+  box.style.display = 'flex';
+  const rows = tiersCache.map((t,i)=>`
+    <div class="edit-tier-row">
+      <button class="tier-move" data-id="${t.id}" data-dir="-1" ${i===0?'disabled':''} title="mover pra esquerda">&larr;</button>
+      <button class="tier-move" data-id="${t.id}" data-dir="1" ${i===tiersCache.length-1?'disabled':''} title="mover pra direita">&rarr;</button>
+      <input type="text" class="tier-nome-input" data-id="${t.id}" value="${t.nome.replace(/"/g,'&quot;')}">
+      <button class="tier-save" data-id="${t.id}">Salvar</button>
+      <button class="link-btn danger tier-del" data-id="${t.id}">remover</button>
+    </div>`).join('');
+  box.innerHTML = rows + `
+    <div class="edit-tier-row">
+      <input type="text" id="novaTierNome" placeholder="nome da nova faixa">
+      <button class="btn-primary" id="novaTierAdd">+ adicionar faixa</button>
+    </div>`;
+  box.querySelectorAll('.tier-save').forEach(b=>b.addEventListener('click', async ()=>{
+    const id = b.dataset.id;
+    const nome = box.querySelector(`.tier-nome-input[data-id="${id}"]`).value.trim();
+    if(!nome) return;
+    await api(`/tiers/${id}`, {method:'PATCH', body: JSON.stringify({nome})});
+    await loadTiers();
+  }));
+  box.querySelectorAll('.tier-del').forEach(b=>b.addEventListener('click', async ()=>{
+    if(!confirm('Remover essa faixa?')) return;
+    try{
+      await api(`/tiers/${b.dataset.id}`, {method:'DELETE'});
+      await loadTiers();
+    }catch(e){
+      alert('Não deu pra remover: mova ou apague os destinos dessa faixa antes.');
+    }
+  }));
+  box.querySelectorAll('.tier-move').forEach(b=>b.addEventListener('click', async ()=>{
+    const id = parseInt(b.dataset.id);
+    const dir = parseInt(b.dataset.dir);
+    const idx = tiersCache.findIndex(t=>t.id===id);
+    const swapIdx = idx + dir;
+    if(swapIdx<0 || swapIdx>=tiersCache.length) return;
+    const a = tiersCache[idx], c = tiersCache[swapIdx];
+    await api(`/tiers/${a.id}`, {method:'PATCH', body: JSON.stringify({ordem: c.ordem})});
+    await api(`/tiers/${c.id}`, {method:'PATCH', body: JSON.stringify({ordem: a.ordem})});
+    await loadTiers();
+  }));
+  const addBtn = document.getElementById('novaTierAdd');
+  addBtn.addEventListener('click', async ()=>{
+    const input = document.getElementById('novaTierNome');
+    const nome = input.value.trim();
+    if(!nome) return;
+    await api('/tiers', {method:'POST', body: JSON.stringify({nome})});
+    input.value = '';
+    await loadTiers();
+  });
+}
+document.getElementById('toggleEditTiers').addEventListener('click', ()=>{
+  editingTiers = !editingTiers;
+  document.getElementById('toggleEditTiers').textContent = editingTiers ? 'fechar edição de faixas' : 'editar faixas';
+  renderEditTiers();
+});
+
 // ---------- destinos ----------
 async function loadDestinos(){
   destinosCache = await api('/destinos');
@@ -364,20 +539,78 @@ function custoLabel(d){
   }
   return `CASAL · ${d.dias.toUpperCase()} <span>sem estimativa</span>`;
 }
+// custo total efetivo de um destino: soma detalhada, ou estimativa mínima, ou 0
+function custoTotal(d){
+  if(d.custos.length>0) return d.custos.reduce((s,c)=>s+c.valor,0);
+  if(d.custo_min>0) return d.custo_min;
+  return 0;
+}
+// resumo rápido: quem está ganhando em curtidas e quem está mais barato
+function renderRanking(){
+  const el = document.getElementById('ranking');
+  if(!el) return;
+  if(destinosCache.length===0){ el.innerHTML=''; return; }
+  const comVotos = destinosCache.filter(d=>d.votos.length>0);
+  const comPreco = destinosCache.filter(d=>custoTotal(d)>0);
+  let html = '';
+  if(comVotos.length){
+    const top = comVotos.reduce((a,b)=> b.votos.length>a.votos.length ? b : a);
+    const n = top.votos.length;
+    html += `
+      <div class="rank-card">
+        <div class="rank-emoji">🏆</div>
+        <div class="rank-body">
+          <div class="rank-label">Mais curtido</div>
+          <div class="rank-nome">${top.nome}</div>
+          <div class="rank-meta"><b>${n} ${n===1?'curtida':'curtidas'}</b> · ${top.votos.join(' e ')}</div>
+        </div>
+      </div>`;
+  }
+  if(comPreco.length){
+    const barato = comPreco.reduce((a,b)=> custoTotal(b)<custoTotal(a) ? b : a);
+    html += `
+      <div class="rank-card price">
+        <div class="rank-emoji">💰</div>
+        <div class="rank-body">
+          <div class="rank-label">Mais em conta</div>
+          <div class="rank-nome">${barato.nome}</div>
+          <div class="rank-meta"><b>R$ ${custoTotal(barato).toLocaleString('pt-BR')}</b> pro casal</div>
+        </div>
+      </div>`;
+  }
+  if(!html){
+    html = '<div class="rank-empty">Curta os destinos e coloque os preços pra ver aqui quem está ganhando 👀</div>';
+  }
+  el.innerHTML = html;
+}
+// Lista aberta: uma linha por categoria, campo de valor já visível (sem dropdown).
+function custoRowsHTML(prefix, valoresPorCategoria){
+  return CATEGORIAS_CUSTO.map(cat=>{
+    const v = valoresPorCategoria[cat] || '';
+    return `<div class="custo-open-row">
+      <label>${cat}</label>
+      <div class="money-field"><span class="sym">R$</span>
+        <input type="number" min="0" step="50" inputmode="numeric" data-prefix="${prefix}" data-cat="${cat}" value="${v}" placeholder="0">
+      </div>
+    </div>`;
+  }).join('');
+}
 function renderDestinos(){
-  const tiers = {1:[],2:[],3:[]};
-  destinosCache.forEach(d=>tiers[d.tier].push(d));
-  const activeTier = document.querySelector('.tab-btn.active').dataset.tier;
+  const buckets = {};
+  tiersCache.forEach(t=>buckets[t.id]=[]);
+  destinosCache.forEach(d=>{ if(buckets[d.tier]) buckets[d.tier].push(d); });
   const wrap = document.getElementById('tierPanels');
   wrap.innerHTML = '';
-  [1,2,3].forEach(tier=>{
+  tiersCache.forEach(t=>{
     const panel = document.createElement('div');
-    panel.className = 'tier-panel' + (String(tier)===activeTier ? ' active' : '');
-    panel.dataset.panel = tier;
-    tiers[tier].forEach((d,i)=>{
+    panel.className = 'tier-panel' + (t.id===activeTierId ? ' active' : '');
+    panel.dataset.panel = t.id;
+    buckets[t.id].forEach((d,i)=>{
       const voted = currentAutor && d.votos.includes(currentAutor);
       const isOpen = openCustos.has(d.id);
       const total = d.custos.reduce((s,c)=>s+c.valor,0);
+      const valsByCat = {};
+      d.custos.forEach(c=>{ valsByCat[c.categoria] = (valsByCat[c.categoria]||0) + c.valor; });
       const card = document.createElement('div');
       card.className = 'card';
       card.style.animationDelay = (i*0.08)+'s';
@@ -397,29 +630,19 @@ function renderDestinos(){
           ${d.criado_por && d.criado_por===currentAutor ? `<button class="link-btn danger del-destino" data-id="${d.id}">remover sugestão</button>` : ''}
         </div>
         <div class="custos-box" id="custos-${d.id}" style="display:${isOpen ? 'block' : 'none'};">
-          <div class="custos-list">
-            ${d.custos.map(c=>`
-              <div class="custo-row">
-                <span class="custo-cat">${c.categoria}</span>
-                <span class="custo-desc">${c.descricao || ''}</span>
-                <span class="custo-valor">R$ ${c.valor.toLocaleString('pt-BR')}</span>
-                <button class="custo-del" data-destino="${d.id}" data-item="${c.id}" title="remover">×</button>
-              </div>`).join('') || '<p class="empty-hint" style="font-size:0.82rem;">Nenhum custo detalhado ainda.</p>'}
+          <div class="custo-open-title">Quanto o casal gasta (R$)</div>
+          <div class="custo-open" data-destino="${d.id}">
+            ${custoRowsHTML('card-'+d.id, valsByCat)}
           </div>
-          ${d.custos.length>0 ? `<div class="custos-total">Total detalhado: <b>R$ ${total.toLocaleString('pt-BR')}</b></div>` : ''}
-          <div class="custo-form">
-            <select class="custo-categoria" data-id="${d.id}">
-              ${CATEGORIAS_CUSTO.map(c=>`<option value="${c}">${c}</option>`).join('')}
-            </select>
-            <input type="text" class="custo-descricao" data-id="${d.id}" placeholder="descrição (opcional)">
-            <input type="number" class="custo-valor" data-id="${d.id}" placeholder="valor R$">
-            <button class="custo-add" data-id="${d.id}" ${currentAutor?'':'disabled title="escolha quem você é"'}>Adicionar</button>
-          </div>
+          <div class="custos-total"><span>Total</span> <b class="custo-total-live" data-destino="${d.id}">R$ ${total.toLocaleString('pt-BR')}</b></div>
+          <button class="custo-save" data-id="${d.id}" ${currentAutor?'':'disabled title="escolha quem você é"'}>Salvar custos</button>
+          <span class="custo-saved-hint" data-destino="${d.id}">salvo ✓</span>
         </div>`;
       panel.appendChild(card);
     });
     wrap.appendChild(panel);
   });
+  renderRanking();
   wrap.querySelectorAll('.vote-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       if(!currentAutor) return;
@@ -445,40 +668,38 @@ function renderDestinos(){
       renderDestinos();
     });
   });
-  wrap.querySelectorAll('.custo-add').forEach(btn=>{
-    btn.addEventListener('click', async ()=>{
-      if(!currentAutor) return;
-      const id = btn.dataset.id;
-      const categoria = wrap.querySelector(`.custo-categoria[data-id="${id}"]`).value;
-      const descricao = wrap.querySelector(`.custo-descricao[data-id="${id}"]`).value.trim();
-      const valorInput = wrap.querySelector(`.custo-valor[data-id="${id}"]`);
-      const valor = parseInt(valorInput.value);
-      if(!valor || valor<=0){ alert('Coloca um valor válido em R$'); return; }
-      openCustos.add(parseInt(id));
-      const d = await api(`/destinos/${id}/custos`, {method:'POST', body: JSON.stringify({categoria, descricao: descricao || null, valor, autor: currentAutor})});
-      const idx = destinosCache.findIndex(x=>x.id===d.id);
-      destinosCache[idx] = d;
-      renderDestinos();
+  // atualiza o total ao vivo enquanto digita, sem re-renderizar (não perde o foco)
+  wrap.querySelectorAll('.custo-open[data-destino]').forEach(box=>{
+    const id = box.dataset.destino;
+    const live = wrap.querySelector(`.custo-total-live[data-destino="${id}"]`);
+    box.querySelectorAll('input[type=number]').forEach(inp=>{
+      inp.addEventListener('input', ()=>{
+        let soma = 0;
+        box.querySelectorAll('input[type=number]').forEach(x=>{ soma += parseInt(x.value)||0; });
+        live.textContent = 'R$ ' + soma.toLocaleString('pt-BR');
+      });
     });
   });
-  wrap.querySelectorAll('.custo-del').forEach(btn=>{
+  wrap.querySelectorAll('.custo-save').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
-      openCustos.add(parseInt(btn.dataset.destino));
-      const d = await api(`/destinos/${btn.dataset.destino}/custos/${btn.dataset.item}`, {method:'DELETE'});
+      if(!currentAutor){ alert('Escolhe quem você é lá em cima primeiro'); return; }
+      const id = btn.dataset.id;
+      const box = wrap.querySelector(`.custo-open[data-destino="${id}"]`);
+      const custos = {};
+      box.querySelectorAll('input[type=number]').forEach(inp=>{
+        const v = parseInt(inp.value);
+        if(v && v>0) custos[inp.dataset.cat] = v;
+      });
+      openCustos.add(parseInt(id));
+      const d = await api(`/destinos/${id}/custos`, {method:'PUT', body: JSON.stringify({custos, autor: currentAutor})});
       const idx = destinosCache.findIndex(x=>x.id===d.id);
       destinosCache[idx] = d;
       renderDestinos();
+      const hint = wrap.querySelector(`.custo-saved-hint[data-destino="${id}"]`);
+      if(hint){ hint.classList.add('show'); setTimeout(()=>hint.classList.remove('show'), 1800); }
     });
   });
 }
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    renderDestinos();
-  });
-});
-
 document.getElementById('toggleAddDestino').addEventListener('click', ()=>{
   const box = document.getElementById('addDestinoForm');
   box.style.display = box.style.display==='none' ? 'flex' : 'none';
@@ -489,16 +710,36 @@ document.getElementById('destSubmit').addEventListener('click', async ()=>{
   const nome = document.getElementById('destNome').value.trim();
   const descricao = document.getElementById('destDescricao').value.trim();
   const dias = document.getElementById('destDias').value.trim();
-  const custo_min = parseInt(document.getElementById('destCustoMin').value) || 0;
-  const custo_max = parseInt(document.getElementById('destCustoMax').value) || 0;
   if(!nome || !descricao || !dias){ alert('Preenche pelo menos nome, descrição e duração'); return; }
-  const d = await api('/destinos', {method:'POST', body: JSON.stringify({tier, nome, descricao, dias, custo_min, custo_max, autor: currentAutor})});
+  const custos = {};
+  document.querySelectorAll('#novoDestinoCustos input[type=number]').forEach(inp=>{
+    const v = parseInt(inp.value);
+    if(v && v>0) custos[inp.dataset.cat] = v;
+  });
+  const d = await api('/destinos', {method:'POST', body: JSON.stringify({tier, nome, descricao, dias, autor: currentAutor, custos})});
   destinosCache.push(d);
-  ['destNome','destDescricao','destDias','destCustoMin','destCustoMax'].forEach(id=>document.getElementById(id).value='');
+  ['destNome','destDescricao','destDias'].forEach(id=>document.getElementById(id).value='');
+  renderNovoDestinoCustos();
   document.getElementById('addDestinoForm').style.display = 'none';
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tier===String(tier)));
+  activeTierId = tier;
+  renderTabs();
   renderDestinos();
 });
+// popula a lista aberta de custos do formulário de novo destino
+function renderNovoDestinoCustos(){
+  document.getElementById('novoDestinoCustos').innerHTML =
+    '<div class="custo-open-title">Quanto acha que o casal vai gastar? (opcional, R$)</div>' +
+    custoRowsHTML('novo', {}) +
+    '<div class="custos-total"><span>Total estimado</span> <b class="custo-total-live" data-prefix="novo">R$ 0</b></div>';
+  const live = document.querySelector('.custo-total-live[data-prefix="novo"]');
+  document.querySelectorAll('#novoDestinoCustos input[type=number]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      let soma = 0;
+      document.querySelectorAll('#novoDestinoCustos input[type=number]').forEach(x=>{ soma += parseInt(x.value)||0; });
+      live.textContent = 'R$ ' + soma.toLocaleString('pt-BR');
+    });
+  });
+}
 
 // ---------- mural ----------
 function linkify(text){
@@ -655,7 +896,11 @@ async function loadOrcamento(){
 }
 
 // ---------- boot ----------
-loadDestinos();
+renderNovoDestinoCustos();
+(async ()=>{
+  await loadTiers();
+  await loadDestinos();
+})();
 loadMural();
 loadChecklist();
 loadOrcamento();

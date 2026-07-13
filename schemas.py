@@ -1,7 +1,25 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel
+
+
+class TierOut(BaseModel):
+    id: int
+    nome: str
+    ordem: int
+
+    class Config:
+        from_attributes = True
+
+
+class TierIn(BaseModel):
+    nome: str
+
+
+class TierUpdate(BaseModel):
+    nome: Optional[str] = None
+    ordem: Optional[int] = None
 
 
 class CustoItemOut(BaseModel):
@@ -19,6 +37,12 @@ class CustoItemIn(BaseModel):
     categoria: str
     descricao: Optional[str] = None
     valor: int
+    autor: Optional[str] = None
+
+
+class CustosMapIn(BaseModel):
+    # {"Passagem": 2500, "Hospedagem": 3000, ...} — substitui todos os custos
+    custos: Dict[str, int] = {}
     autor: Optional[str] = None
 
 
@@ -48,6 +72,7 @@ class DestinoIn(BaseModel):
     custo_min: int = 0
     custo_max: int = 0
     autor: str
+    custos: Dict[str, int] = {}  # categoria -> valor, opcional já na criação
 
 
 class VotarIn(BaseModel):
