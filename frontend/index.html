@@ -321,6 +321,11 @@ for(let i=0;i<40;i++){
   starsEl.appendChild(s);
 }
 
+// ---------- destinos (estado, precisa existir antes do bloco de autor abaixo) ----------
+const CATEGORIAS_CUSTO = ['Passagem','Hospedagem','Alimentação','Transporte local','Passeios','Outros'];
+let destinosCache = [];
+let openCustos = new Set();
+
 // ---------- autor ----------
 let currentAutor = localStorage.getItem('viagem_autor') || null;
 function setAutor(nome){
@@ -345,9 +350,6 @@ async function api(path, options){
 }
 
 // ---------- destinos ----------
-const CATEGORIAS_CUSTO = ['Passagem','Hospedagem','Alimentação','Transporte local','Passeios','Outros'];
-let destinosCache = [];
-let openCustos = new Set();
 async function loadDestinos(){
   destinosCache = await api('/destinos');
   renderDestinos();
