@@ -86,6 +86,23 @@
   .rank-card.price .rank-meta b{color:#ffe1c2;}
   .rank-empty{grid-column:1/-1; background:var(--sand); border-radius:16px; padding:1.1rem 1.4rem; font-size:0.9rem; color:var(--ink-soft); font-style:italic; text-align:center;}
 
+  /* ===== ESCOLHA DEFINITIVA DO DESTINO ===== */
+  .escolha-banner{background:linear-gradient(135deg, var(--gold), var(--coral)); color:#fff; border-radius:18px; padding:1.5rem 1.6rem; margin-bottom:2rem; display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap; box-shadow:0 14px 30px -14px rgba(217,78,47,0.6);}
+  .escolha-banner .eb-emoji{font-size:2.2rem; line-height:1;}
+  .escolha-banner .eb-body{flex:1; min-width:200px;}
+  .escolha-banner .eb-label{font-size:0.68rem; text-transform:uppercase; letter-spacing:0.14em; opacity:0.92; font-weight:700;}
+  .escolha-banner .eb-nome{font-family:'Fraunces',serif; font-size:1.55rem; font-weight:600; line-height:1.1; margin:0.12rem 0;}
+  .escolha-banner .eb-meta{font-size:0.92rem; opacity:0.96;}
+  .escolha-banner .eb-meta b{font-weight:700;}
+  .escolha-banner .eb-cta{background:#fff; color:var(--coral-dark); border:none; padding:0.7rem 1.2rem; border-radius:100px; font-weight:700; font-size:0.86rem; cursor:pointer; text-decoration:none; white-space:nowrap;}
+  .escolher-btn{margin-top:0.9rem; width:100%; background:var(--gold); color:var(--teal-900); border:none; padding:0.72rem 1rem; border-radius:12px; font-weight:700; font-size:0.9rem; cursor:pointer; transition:filter .2s;}
+  .escolher-btn:hover{filter:brightness(1.06);}
+  .escolher-btn.undo{background:transparent; border:1.5px solid var(--gold); color:var(--coral-dark);}
+  .card-escolhido{border-left-color:var(--gold); box-shadow:0 0 0 2px var(--gold), 0 16px 32px -14px rgba(10,55,51,0.35); background:linear-gradient(180deg, #fff7e6, var(--sand));}
+  .escolhido-badge{display:inline-flex; align-items:center; gap:5px; background:var(--gold); color:var(--teal-900); font-size:0.64rem; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; padding:0.3rem 0.7rem; border-radius:100px; margin-bottom:0.6rem;}
+  .calc-escolha-note{background:rgba(232,163,61,0.16); border:1px solid rgba(232,163,61,0.4); border-radius:12px; padding:0.95rem 1.15rem; margin-bottom:1.6rem; font-size:0.92rem; color:var(--cream); line-height:1.55;}
+  .calc-escolha-note b{color:var(--gold);}
+
   /* ===== DESTINOS ===== */
   .tabs{display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:2.2rem;}
   .tab-btn{font-weight:600; font-size:0.86rem; padding:0.65rem 1.2rem; border-radius:100px; border:1.5px solid var(--teal-700); background:transparent; color:var(--teal-800); cursor:pointer; transition:all .25s ease;}
@@ -243,6 +260,10 @@
     .ranking{grid-template-columns:1fr; gap:0.7rem; margin-bottom:1.6rem;}
     .rank-card{padding:1rem 1.1rem;}
 
+    /* banner de escolha empilha */
+    .escolha-banner{padding:1.2rem 1.2rem; gap:0.8rem;}
+    .escolha-banner .eb-cta{width:100%; text-align:center;}
+
     /* destinos: sempre uma coluna, cartão respira melhor */
     .tier-panel.active{grid-template-columns:1fr; gap:1rem;}
     .card{padding:1.4rem 1.3rem;}
@@ -307,6 +328,7 @@
       <h2>Praia, natureza e nada de clichê</h2>
       <p>Cada um sugere os lugares que quer, os dois votam curtindo — o coração mostra quem já votou. Abre cada destino pra detalhar quanto custa passagem, hospedagem, comida e o resto.</p>
     </div>
+    <div id="escolhaBanner"></div>
     <div class="ranking" id="ranking"></div>
     <div class="tabs" id="tabsWrap"></div>
     <div class="tabs-actions">
@@ -348,6 +370,7 @@
       <h2>A calculadora da viagem</h2>
       <p>Fica salva pros dois verem sempre o mesmo número — mexe aqui e atualiza pra todo mundo.</p>
     </div>
+    <div id="calcEscolhaNote"></div>
     <div class="calc-box">
       <div>
         <div class="field"><label>Orçamento total da viagem <b id="budgetLabel">R$ 12.000</b></label>
@@ -412,6 +435,8 @@ let tiersCache = [];
 let activeTierId = null;
 let editingTiers = false;
 let openCustos = new Set();
+let escolhidoId = null;
+let orcamentoCfg = null;
 
 // ---------- autor ----------
 let currentAutor = localStorage.getItem('viagem_autor') || null;
@@ -583,6 +608,42 @@ function renderRanking(){
   }
   el.innerHTML = html;
 }
+// banner do destino fechado — quando há escolha, esconde o ranking e mostra o destaque
+function renderEscolhaBanner(){
+  const banner = document.getElementById('escolhaBanner');
+  const ranking = document.getElementById('ranking');
+  if(!banner) return;
+  const d = escolhidoId ? destinosCache.find(x=>x.id===escolhidoId) : null;
+  if(!d){
+    banner.innerHTML = '';
+    if(ranking) ranking.style.display = '';
+    return;
+  }
+  if(ranking) ranking.style.display = 'none';
+  const total = custoTotal(d);
+  const metaCusto = total>0 ? `custo do casal <b>R$ ${total.toLocaleString('pt-BR')}</b>` : 'ainda sem custo detalhado';
+  banner.innerHTML = `
+    <div class="escolha-banner">
+      <div class="eb-emoji">🏝️</div>
+      <div class="eb-body">
+        <div class="eb-label">Destino fechado</div>
+        <div class="eb-nome">${d.nome}</div>
+        <div class="eb-meta">${d.dias} · ${metaCusto}</div>
+      </div>
+      <a class="eb-cta" href="#calculadora">ver plano mensal →</a>
+    </div>`;
+}
+// nota dentro da calculadora ligando o plano ao destino escolhido
+function renderCalcNote(){
+  const note = document.getElementById('calcEscolhaNote');
+  if(!note) return;
+  const d = escolhidoId ? destinosCache.find(x=>x.id===escolhidoId) : null;
+  if(!d){ note.innerHTML = ''; return; }
+  const total = custoTotal(d);
+  note.innerHTML = total>0
+    ? `<div class="calc-escolha-note">✈️ Planejando a viagem pra <b>${d.nome}</b>. O orçamento abaixo já está no custo total dele — <b>R$ ${total.toLocaleString('pt-BR')}</b>. Ajuste a renda e a data pra ver quanto guardar por mês.</div>`
+    : `<div class="calc-escolha-note">✈️ Destino fechado: <b>${d.nome}</b>. Detalhe os custos dele lá em cima pra o plano mensal usar o valor real.</div>`;
+}
 // Lista aberta: uma linha por categoria, campo de valor já visível (sem dropdown).
 function custoRowsHTML(prefix, valoresPorCategoria){
   return CATEGORIAS_CUSTO.map(cat=>{
@@ -611,12 +672,13 @@ function renderDestinos(){
       const total = d.custos.reduce((s,c)=>s+c.valor,0);
       const valsByCat = {};
       d.custos.forEach(c=>{ valsByCat[c.categoria] = (valsByCat[c.categoria]||0) + c.valor; });
+      const escolhido = d.id===escolhidoId;
       const card = document.createElement('div');
-      card.className = 'card';
+      card.className = 'card' + (escolhido ? ' card-escolhido' : '');
       card.style.animationDelay = (i*0.08)+'s';
       card.innerHTML = `
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">${ICONS[d.icon_key]||ICONS.wave}</svg>
-        ${d.criado_por ? `<span class="suggest-tag">sugestão de ${d.criado_por}</span>` : ''}
+        ${escolhido ? '<span class="escolhido-badge">★ destino escolhido</span>' : (d.criado_por ? `<span class="suggest-tag">sugestão de ${d.criado_por}</span>` : '')}
         <h3>${d.nome}</h3>
         <p>${d.descricao}</p>
         <div class="card-foot">
@@ -629,6 +691,9 @@ function renderDestinos(){
           <button class="link-btn custos-toggle" data-id="${d.id}">${isOpen ? 'esconder custos' : 'detalhar custos'}</button>
           <button class="link-btn danger del-destino" data-id="${d.id}">excluir destino</button>
         </div>
+        <button class="escolher-btn ${escolhido?'undo':''}" data-id="${d.id}" data-escolhido="${escolhido?1:0}">
+          ${escolhido ? '✓ é esse! (toque pra desfazer)' : '✈️ é esse! escolher este destino'}
+        </button>
         <div class="custos-box" id="custos-${d.id}" style="display:${isOpen ? 'block' : 'none'};">
           <div class="custo-open-title">Quanto o casal gasta (R$)</div>
           <div class="custo-open" data-destino="${d.id}">
@@ -643,6 +708,8 @@ function renderDestinos(){
     wrap.appendChild(panel);
   });
   renderRanking();
+  renderEscolhaBanner();
+  renderCalcNote();
   wrap.querySelectorAll('.vote-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       if(!currentAutor) return;
@@ -665,7 +732,25 @@ function renderDestinos(){
       const q = currentAutor ? `?autor=${encodeURIComponent(currentAutor)}` : '';
       await api(`/destinos/${btn.dataset.id}${q}`, {method:'DELETE'});
       destinosCache = destinosCache.filter(x=>x.id!==parseInt(btn.dataset.id));
+      if(escolhidoId===parseInt(btn.dataset.id)) escolhidoId = null;
       renderDestinos();
+    });
+  });
+  wrap.querySelectorAll('.escolher-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const jaEscolhido = btn.dataset.escolhido==='1';
+      const id = jaEscolhido ? null : parseInt(btn.dataset.id);
+      if(!jaEscolhido){
+        const d = destinosCache.find(x=>x.id===id);
+        if(!confirm(`Fechar "${d.nome}" como o destino da viagem? O plano mensal passa a usar o custo dele.`)) return;
+      }
+      orcamentoCfg = await api('/escolha', {method:'PUT', body: JSON.stringify({destino_id: id, autor: currentAutor})});
+      escolhidoId = orcamentoCfg.destino_escolhido_id;
+      aplicarOrcamento();
+      renderDestinos();
+      if(id!==null){
+        document.getElementById('calculadora').scrollIntoView({behavior:'smooth'});
+      }
     });
   });
   // atualiza o total ao vivo enquanto digita, sem re-renderizar (não perde o foco)
@@ -887,12 +972,22 @@ function scheduleSave(){
 }
 [budget, income, weddingDate].forEach(el => el.addEventListener('input', ()=>{recalc(); scheduleSave();}));
 
-async function loadOrcamento(){
-  const cfg = await api('/orcamento');
-  budget.value = cfg.orcamento_total;
-  income.value = cfg.renda_combinada;
-  weddingDate.value = cfg.data_casamento;
+function aplicarOrcamento(){
+  if(!orcamentoCfg) return;
+  escolhidoId = orcamentoCfg.destino_escolhido_id;
+  // o custo escolhido pode passar do teto do slider — amplia os limites se preciso
+  if(orcamentoCfg.orcamento_total > parseInt(budget.max)) budget.max = orcamentoCfg.orcamento_total;
+  if(orcamentoCfg.orcamento_total < parseInt(budget.min)) budget.min = orcamentoCfg.orcamento_total;
+  budget.value = orcamentoCfg.orcamento_total;
+  income.value = orcamentoCfg.renda_combinada;
+  weddingDate.value = orcamentoCfg.data_casamento;
   recalc();
+  renderCalcNote();
+}
+async function loadOrcamento(){
+  orcamentoCfg = await api('/orcamento');
+  aplicarOrcamento();
+  renderDestinos();
 }
 
 // ---------- boot ----------
@@ -900,10 +995,10 @@ renderNovoDestinoCustos();
 (async ()=>{
   await loadTiers();
   await loadDestinos();
+  await loadOrcamento();
 })();
 loadMural();
 loadChecklist();
-loadOrcamento();
 </script>
 
 </body>
