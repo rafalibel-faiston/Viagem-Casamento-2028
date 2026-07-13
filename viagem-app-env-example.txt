@@ -1,0 +1,5 @@
+# Renomeie este arquivo pra ".env" se for rodar localmente.
+# No Railway isso NÃO é necessário: a variável DATABASE_URL já vem pronta
+# quando você referencia o Postgres addon nas Variables do serviço.
+
+DATABASE_URL=postgresql://usuario:senha@localhost:5432/viagem_db

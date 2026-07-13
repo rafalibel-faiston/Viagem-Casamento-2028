@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rafa & Vitória — Viagem de Casamento 2028</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal-900:#0a3733; --teal-800:#0e453f; --teal-700:#155850; --teal-500:#1f7f70;
+    --coral:#ff6b4a; --coral-dark:#d94e2f; --gold:#e8a33d;
+    --sand:#f2e4c8; --cream:#fbf5e9; --ink:#122523; --ink-soft:#3c5652;
+    font-size:16px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Work Sans', sans-serif; background:var(--cream); color:var(--ink); overflow-x:hidden;}
+  h1,h2,h3,.display{font-family:'Fraunces', serif; font-weight:600; letter-spacing:-0.01em;}
+  a{color:inherit;}
+  button{font-family:inherit;}
+  ::selection{background:var(--coral); color:var(--cream);}
+
+  /* ===== AUTOR SWITCHER ===== */
+  .autor-bar{
+    position:fixed; top:0; right:0; z-index:50;
+    display:flex; gap:6px; padding:0.8rem 1rem;
+    background:rgba(10,55,51,0.85); backdrop-filter:blur(6px);
+    border-bottom-left-radius:16px; align-items:center;
+  }
+  .autor-bar span{font-size:0.68rem; color:rgba(251,245,233,0.6); text-transform:uppercase; letter-spacing:0.1em; margin-right:4px;}
+  .autor-btn{
+    padding:0.4rem 0.85rem; border-radius:100px; border:1.5px solid rgba(251,245,233,0.35);
+    background:transparent; color:var(--cream); font-size:0.82rem; font-weight:600; cursor:pointer;
+    transition:all .2s ease;
+  }
+  .autor-btn.active{background:var(--coral); border-color:var(--coral);}
+
+  /* ===== HERO ===== */
+  .hero{
+    position:relative; min-height:92vh;
+    background:linear-gradient(180deg, #0a2f2c 0%, #0e453f 38%, #1f7f70 62%, #ff9a63 88%, #ffb877 100%);
+    overflow:hidden; display:flex; flex-direction:column; justify-content:center; align-items:center;
+    color:var(--cream); text-align:center; padding:2rem 1.5rem;
+  }
+  .sun{
+    position:absolute; top:14%; left:50%; transform:translateX(-50%); width:170px; height:170px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ffe9c2, var(--gold) 55%, var(--coral) 100%);
+    box-shadow:0 0 90px 30px rgba(255,167,90,0.45); animation:pulse 6s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{transform:translateX(-50%) scale(1);}50%{transform:translateX(-50%) scale(1.05);}}
+  .stars{position:absolute; inset:0 0 60% 0;}
+  .stars span{position:absolute; width:2px; height:2px; background:rgba(255,255,255,0.8); border-radius:50%; animation:twinkle 3s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:.15;}50%{opacity:.9;}}
+  .waves{position:absolute; bottom:0; left:0; width:100%; line-height:0;}
+  .waves svg{width:200%; height:auto; animation:drift 26s linear infinite;}
+  .waves.w2 svg{animation-duration:38s; animation-direction:reverse;}
+  @keyframes drift{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+  .hero-content{position:relative; z-index:3; max-width:760px;}
+  .eyebrow{text-transform:uppercase; letter-spacing:0.35em; font-size:0.72rem; opacity:0.85; margin-bottom:1.4rem;}
+  .hero h1{font-size:clamp(2.6rem, 7vw, 5rem); line-height:0.98; text-shadow:0 6px 30px rgba(0,0,0,0.25);}
+  .hero h1 .amp{color:var(--gold); font-style:italic; font-weight:500;}
+  .hero p.sub{margin-top:1.6rem; font-size:clamp(1.05rem, 2vw, 1.3rem); font-weight:300; opacity:0.95; max-width:520px; margin-left:auto; margin-right:auto;}
+  .scroll-cue{position:absolute; bottom:2.2rem; left:50%; transform:translateX(-50%); z-index:3; display:flex; flex-direction:column; align-items:center; gap:6px; font-size:0.68rem; letter-spacing:0.25em; text-transform:uppercase; opacity:0.8;}
+  .scroll-cue .line{width:1px; height:34px; background:rgba(255,255,255,0.6); animation:scrollmove 1.8s ease-in-out infinite;}
+  @keyframes scrollmove{0%{transform:scaleY(0.3); opacity:0.3;}50%{transform:scaleY(1); opacity:1;}100%{transform:scaleY(0.3); opacity:0.3;}}
+
+  section{padding:5.5rem 1.5rem; position:relative;}
+  .wrap{max-width:1080px; margin:0 auto;}
+  .section-head{max-width:640px; margin-bottom:2.8rem;}
+  .section-head .tag{display:inline-block; font-size:0.72rem; letter-spacing:0.28em; text-transform:uppercase; color:var(--coral-dark); font-weight:600; margin-bottom:0.9rem;}
+  .section-head h2{font-size:clamp(1.9rem, 4vw, 2.7rem); color:var(--teal-900);}
+  .section-head p{margin-top:1rem; color:var(--ink-soft); font-size:1.02rem; line-height:1.6; font-weight:300;}
+
+  /* ===== DESTINOS ===== */
+  .tabs{display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:2.2rem;}
+  .tab-btn{font-weight:600; font-size:0.86rem; padding:0.65rem 1.2rem; border-radius:100px; border:1.5px solid var(--teal-700); background:transparent; color:var(--teal-800); cursor:pointer; transition:all .25s ease;}
+  .tab-btn:hover{background:rgba(21,88,80,0.08);}
+  .tab-btn.active{background:var(--teal-800); color:var(--cream); border-color:var(--teal-800);}
+  .tier-panel{display:none;}
+  .tier-panel.active{display:grid; grid-template-columns:repeat(auto-fit, minmax(270px,1fr)); gap:1.3rem;}
+  .card{background:var(--sand); border-radius:18px; padding:1.7rem 1.6rem; position:relative; overflow:hidden; border-left:5px solid var(--coral); opacity:0; transform:translateY(14px); animation:cardIn .5s ease forwards; box-shadow:0 10px 24px -14px rgba(10,55,51,0.25); transition:transform .3s ease, box-shadow .3s ease;}
+  .card:hover{transform:translateY(-4px); box-shadow:0 16px 32px -14px rgba(10,55,51,0.35);}
+  @keyframes cardIn{to{opacity:1; transform:translateY(0);}}
+  .card .icon{width:34px; height:34px; margin-bottom:0.9rem; color:var(--teal-800);}
+  .card h3{font-size:1.24rem; color:var(--teal-900); margin-bottom:0.5rem;}
+  .card p{font-size:0.9rem; color:var(--ink-soft); line-height:1.5; font-weight:300; margin-bottom:1rem;}
+  .card-foot{display:flex; align-items:center; justify-content:space-between; gap:0.6rem; flex-wrap:wrap;}
+  .cost{display:inline-flex; align-items:baseline; gap:6px; background:var(--teal-900); color:var(--cream); padding:0.4rem 0.8rem; border-radius:100px; font-size:0.76rem; font-weight:600;}
+  .cost span{font-family:'Fraunces',serif; font-size:0.95rem; font-weight:600; color:var(--gold);}
+  .vote-btn{display:inline-flex; align-items:center; gap:6px; border:1.5px solid var(--teal-700); background:transparent; color:var(--teal-800); padding:0.4rem 0.75rem; border-radius:100px; cursor:pointer; font-size:0.8rem; font-weight:600; transition:all .2s ease;}
+  .vote-btn svg{width:15px; height:15px;}
+  .vote-btn.voted{background:var(--coral); border-color:var(--coral); color:#fff;}
+  .vote-btn.voted svg{fill:#fff;}
+
+  /* ===== MURAL ===== */
+  .mural-form{background:var(--sand); border-radius:18px; padding:1.4rem; margin-bottom:2rem; display:flex; gap:0.8rem; flex-wrap:wrap;}
+  .mural-form textarea{flex:1; min-width:220px; border:1.5px solid rgba(10,55,51,0.2); border-radius:12px; padding:0.75rem 1rem; font-family:'Work Sans'; font-size:0.92rem; resize:vertical; min-height:52px; background:var(--cream); color:var(--ink);}
+  .btn-primary{background:var(--coral); color:#fff; border:none; padding:0 1.4rem; border-radius:12px; font-weight:600; font-size:0.9rem; cursor:pointer; transition:background .2s ease;}
+  .btn-primary:hover{background:var(--coral-dark);}
+  .btn-primary:disabled{opacity:0.4; cursor:not-allowed;}
+  .mural-list{display:flex; flex-direction:column; gap:1rem;}
+  .mural-item{background:var(--sand); border-radius:16px; padding:1.3rem 1.5rem;}
+  .mural-item .meta{display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;}
+  .mural-item .autor-tag{font-weight:700; font-size:0.82rem; color:var(--teal-800);}
+  .mural-item .time{font-size:0.72rem; color:var(--ink-soft); opacity:0.7;}
+  .mural-item .conteudo{font-size:0.95rem; line-height:1.5; color:var(--ink); margin-bottom:0.8rem; word-break:break-word;}
+  .mural-item .conteudo a{color:var(--coral-dark); text-decoration:underline;}
+  .mural-item .del{background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:0.78rem; opacity:0.6;}
+  .mural-item .del:hover{opacity:1; color:var(--coral-dark);}
+  .comments{border-top:1px dashed rgba(10,55,51,0.2); padding-top:0.7rem; margin-top:0.4rem;}
+  .comment{font-size:0.85rem; margin-bottom:0.4rem; color:var(--ink-soft);}
+  .comment b{color:var(--teal-800);}
+  .comment-form{display:flex; gap:0.5rem; margin-top:0.6rem;}
+  .comment-form input{flex:1; border:1px solid rgba(10,55,51,0.2); border-radius:8px; padding:0.4rem 0.7rem; font-size:0.82rem; background:var(--cream);}
+  .comment-form button{background:var(--teal-800); color:var(--cream); border:none; padding:0 0.9rem; border-radius:8px; font-size:0.8rem; cursor:pointer;}
+  .empty-hint{color:var(--ink-soft); font-size:0.9rem; font-weight:300; font-style:italic;}
+
+  /* ===== CALCULADORA ===== */
+  .calc-section{background:var(--teal-900); color:var(--cream);}
+  .calc-section .section-head h2{color:var(--cream);}
+  .calc-section .section-head p{color:rgba(251,245,233,0.72);}
+  .calc-section .tag{color:var(--gold);}
+  .calc-box{background:rgba(251,245,233,0.06); border:1px solid rgba(251,245,233,0.16); border-radius:24px; padding:2.2rem; backdrop-filter:blur(6px); display:grid; grid-template-columns:1fr 1fr; gap:2.4rem;}
+  @media(max-width:760px){.calc-box{grid-template-columns:1fr;}}
+  .field{margin-bottom:1.7rem;}
+  .field label{display:flex; justify-content:space-between; font-size:0.83rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.65rem; color:rgba(251,245,233,0.85);}
+  .field label b{color:var(--gold); font-family:'Fraunces',serif; font-size:1.02rem; letter-spacing:0; text-transform:none;}
+  input[type=range]{-webkit-appearance:none; width:100%; height:4px; border-radius:4px; background:rgba(251,245,233,0.25); outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--coral); cursor:pointer; border:3px solid var(--cream); box-shadow:0 2px 8px rgba(0,0,0,0.35);}
+  input[type=range]::-moz-range-thumb{width:20px; height:20px; border-radius:50%; background:var(--coral); cursor:pointer; border:3px solid var(--cream);}
+  input[type=date]{width:100%; padding:0.65rem 0.9rem; border-radius:10px; border:1px solid rgba(251,245,233,0.3); background:rgba(251,245,233,0.08); color:var(--cream); font-family:'Work Sans'; font-size:0.92rem;}
+  input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1); opacity:0.8;}
+  .result{display:flex; flex-direction:column; justify-content:center; align-items:flex-start; border-left:1px solid rgba(251,245,233,0.16); padding-left:2.4rem;}
+  @media(max-width:760px){.result{border-left:none; border-top:1px solid rgba(251,245,233,0.16); padding-left:0; padding-top:1.6rem;}}
+  .result .label{font-size:0.76rem; text-transform:uppercase; letter-spacing:0.25em; color:rgba(251,245,233,0.6);}
+  .result .amount{font-family:'Fraunces',serif; font-weight:600; font-size:clamp(2.3rem,4.5vw,3.2rem); color:var(--gold); margin:0.3rem 0 0.2rem 0; line-height:1;}
+  .result .amount .per{font-size:1rem; font-weight:400; color:rgba(251,245,233,0.7); font-family:'Work Sans';}
+  .result .sub-info{font-size:0.84rem; color:rgba(251,245,233,0.65); margin-top:0.55rem; line-height:1.5; font-weight:300;}
+  .result .sub-info b{color:var(--cream); font-weight:600;}
+  .save-hint{font-size:0.72rem; color:rgba(251,245,233,0.45); margin-top:1rem;}
+
+  /* ===== CHECKLIST ===== */
+  .checklist{display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.4rem;}
+  .check-row{display:flex; align-items:center; gap:0.8rem; background:var(--sand); border-radius:12px; padding:0.85rem 1.1rem;}
+  .check-row.done{opacity:0.55;}
+  .check-row.done span{text-decoration:line-through;}
+  .checkbox{width:22px; height:22px; border-radius:6px; border:2px solid var(--teal-700); cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:transparent;}
+  .checkbox.checked{background:var(--teal-700);}
+  .checkbox svg{width:13px; height:13px; stroke:var(--cream); fill:none; stroke-width:3; opacity:0;}
+  .checkbox.checked svg{opacity:1;}
+  .check-row span{flex:1; font-size:0.95rem;}
+  .check-row .del{background:none; border:none; color:var(--ink-soft); opacity:0.5; cursor:pointer; font-size:0.9rem;}
+  .check-row .del:hover{opacity:1; color:var(--coral-dark);}
+  .checklist-form{display:flex; gap:0.6rem;}
+  .checklist-form input{flex:1; border:1.5px solid rgba(10,55,51,0.2); border-radius:10px; padding:0.7rem 1rem; font-size:0.92rem; background:var(--sand);}
+
+  footer{background:var(--teal-900); color:rgba(251,245,233,0.6); text-align:center; padding:2.4rem 1.5rem; font-size:0.82rem; font-weight:300;}
+  footer .heart{color:var(--coral); font-style:italic; font-family:'Fraunces',serif;}
+
+  .loading-dot{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--coral); animation:blink 1s infinite;}
+  @keyframes blink{0%,100%{opacity:0.2;}50%{opacity:1;}}
+</style>
+</head>
+<body>
+
+<div class="autor-bar">
+  <span>quem é você?</span>
+  <button class="autor-btn" data-autor="Rafa">Rafa</button>
+  <button class="autor-btn" data-autor="Vitória">Vitória</button>
+</div>
+
+<section class="hero">
+  <div class="stars" id="stars"></div>
+  <div class="sun"></div>
+  <div class="hero-content">
+    <div class="eyebrow">O casamento, do nosso jeito</div>
+    <h1>Vitória <span class="amp">&</span> Rafa</h1>
+    <p class="sub">Em vez de festa, escolhemos estrada. Aqui a gente organiza ideias, referências e a grana da nossa viagem de casamento em <strong>2028</strong>.</p>
+  </div>
+  <div class="waves"><svg viewBox="0 0 1440 130" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,64L60,72C120,80,240,96,360,90C480,84,600,56,720,53C840,50,960,72,1080,80C1200,88,1320,80,1380,76L1440,72L1440,130L0,130Z" fill="#ffcf8f" opacity="0.55"/></svg></div>
+  <div class="waves w2"><svg viewBox="0 0 1440 130" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,90L60,80C120,70,240,50,360,53C480,56,600,82,720,88C840,94,960,78,1080,68C1200,58,1320,54,1380,52L1440,50L1440,130L0,130Z" fill="#fbf5e9"/></svg></div>
+  <div class="scroll-cue"><span>role</span><div class="line"></div></div>
+</section>
+
+<section id="destinos">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="tag">Destinos fora do óbvio</span>
+      <h2>Praia, natureza e nada de clichê</h2>
+      <p>Vota no que mais curtir — o coração fica marcado com quem já votou. Três faixas de orçamento, todas fugindo do circuito batido.</p>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tier="1">Tier 1 · Brasil</button>
+      <button class="tab-btn" data-tier="2">Tier 2 · América do Sul</button>
+      <button class="tab-btn" data-tier="3">Tier 3 · Esticando</button>
+    </div>
+    <div id="tierPanels"></div>
+  </div>
+</section>
+
+<section id="mural" style="background:var(--sand);">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="tag">Ideias soltas</span>
+      <h2>Mural de referências</h2>
+      <p>Um link, um reels que viu, uma dica de alguém — cola aqui antes que esqueça. Dá pra comentar em cima do que o outro postou.</p>
+    </div>
+    <div class="mural-form">
+      <textarea id="muralInput" placeholder="Cola um link, uma ideia ou uma dica..."></textarea>
+      <button class="btn-primary" id="muralSubmit" disabled>Postar</button>
+    </div>
+    <div class="mural-list" id="muralList"></div>
+  </div>
+</section>
+
+<section class="calc-section" id="calculadora">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="tag">Quanto guardar por mês</span>
+      <h2>A calculadora da viagem</h2>
+      <p>Fica salva pros dois verem sempre o mesmo número — mexe aqui e atualiza pra todo mundo.</p>
+    </div>
+    <div class="calc-box">
+      <div>
+        <div class="field"><label>Orçamento total da viagem <b id="budgetLabel">R$ 12.000</b></label>
+          <input type="range" id="budget" min="6000" max="22000" step="500" value="12000"></div>
+        <div class="field"><label>Renda combinada do casal / mês <b id="incomeLabel">R$ 5.500</b></label>
+          <input type="range" id="income" min="3000" max="10000" step="100" value="5500"></div>
+        <div class="field"><label>Data prevista do casamento</label>
+          <input type="date" id="weddingDate" value="2028-07-01" min="2026-08-01" max="2028-12-31"></div>
+      </div>
+      <div class="result">
+        <span class="label">Guardar por mês</span>
+        <div class="amount" id="monthlyAmount">R$ 0<span class="per"> /mês</span></div>
+        <div class="sub-info" id="monthsInfo">calculando…</div>
+        <div class="sub-info" id="incomePct"></div>
+        <div class="save-hint" id="saveHint">salvo automaticamente <span class="loading-dot" style="display:none;" id="saveDot"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="checklist">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="tag">Próximos passos</span>
+      <h2>Checklist</h2>
+    </div>
+    <div class="checklist" id="checklistList"></div>
+    <div class="checklist-form">
+      <input type="text" id="checklistInput" placeholder="Adicionar novo passo...">
+      <button class="btn-primary" id="checklistSubmit">Adicionar</button>
+    </div>
+  </div>
+</section>
+
+<footer>feito com <span class="heart">carinho</span> por Rafa, pra Vitória</footer>
+
+<script>
+const ICONS = {
+  wave:  '<path d="M3 17c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/><path d="M3 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/>',
+  dune:  '<path d="M2 20 L9 8 L14 15 L18 9 L22 20 Z"/><circle cx="17" cy="5" r="2"/>',
+  tree:  '<path d="M3 21c4-8 7-11 9-15 2 4 5 7 9 15"/><path d="M3 21h18"/>',
+  river: '<path d="M4 4v16M4 4c4 0 4 3 8 3s4-3 8-3v10c-4 0-4 3-8 3s-4-3-8-3"/>',
+  globe: '<path d="M3 12h18M3 12a9 9 0 0 1 9-9M3 12a9 9 0 0 0 9 9M21 12a9 9 0 0 0-9-9M21 12a9 9 0 0 1-9 9"/>',
+  compass:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',
+};
+const HEART = '<path d="M12 21s-7-4.5-9.5-9C.7 8.4 2.3 5 5.8 5c2 0 3.4 1.1 4.2 2.3C10.8 6.1 12.2 5 14.2 5c3.5 0 5.1 3.4 3.3 7-2.5 4.5-9.5 9-9.5 9Z"/>';
+
+// estrelas
+const starsEl = document.getElementById('stars');
+for(let i=0;i<40;i++){
+  const s = document.createElement('span');
+  s.style.left = Math.random()*100+'%';
+  s.style.top = Math.random()*70+'%';
+  s.style.animationDelay = (Math.random()*3)+'s';
+  starsEl.appendChild(s);
+}
+
+// ---------- autor ----------
+let currentAutor = localStorage.getItem('viagem_autor') || null;
+function setAutor(nome){
+  currentAutor = nome;
+  localStorage.setItem('viagem_autor', nome);
+  document.querySelectorAll('.autor-btn').forEach(b=>b.classList.toggle('active', b.dataset.autor===nome));
+  document.getElementById('muralSubmit').disabled = false;
+  renderDestinos(); // reflete voto do usuário atual
+}
+document.querySelectorAll('.autor-btn').forEach(b=>{
+  b.addEventListener('click', ()=>setAutor(b.dataset.autor));
+});
+if(currentAutor) setAutor(currentAutor);
+
+async function api(path, options){
+  const res = await fetch('/api'+path, {
+    headers:{'Content-Type':'application/json'},
+    ...options,
+  });
+  if(!res.ok) throw new Error('Erro na API: '+path);
+  return res.status===204 ? null : res.json();
+}
+
+// ---------- destinos ----------
+let destinosCache = [];
+async function loadDestinos(){
+  destinosCache = await api('/destinos');
+  renderDestinos();
+}
+function renderDestinos(){
+  const tiers = {1:[],2:[],3:[]};
+  destinosCache.forEach(d=>tiers[d.tier].push(d));
+  const activeTier = document.querySelector('.tab-btn.active').dataset.tier;
+  const wrap = document.getElementById('tierPanels');
+  wrap.innerHTML = '';
+  [1,2,3].forEach(tier=>{
+    const panel = document.createElement('div');
+    panel.className = 'tier-panel' + (String(tier)===activeTier ? ' active' : '');
+    panel.dataset.panel = tier;
+    tiers[tier].forEach((d,i)=>{
+      const voted = currentAutor && d.votos.includes(currentAutor);
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.animationDelay = (i*0.08)+'s';
+      card.innerHTML = `
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">${ICONS[d.icon_key]||ICONS.wave}</svg>
+        <h3>${d.nome}</h3>
+        <p>${d.descricao}</p>
+        <div class="card-foot">
+          <div class="cost">CASAL · ${d.dias.toUpperCase()} <span>R$ ${d.custo_min.toLocaleString('pt-BR')}–${d.custo_max.toLocaleString('pt-BR')}</span></div>
+          <button class="vote-btn ${voted?'voted':''}" data-id="${d.id}" ${currentAutor?'':'disabled title="escolha quem você é"'}>
+            <svg viewBox="0 0 24 24">${HEART}</svg> ${d.votos.length}
+          </button>
+        </div>`;
+      panel.appendChild(card);
+    });
+    wrap.appendChild(panel);
+  });
+  wrap.querySelectorAll('.vote-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(!currentAutor) return;
+      const d = await api(`/destinos/${btn.dataset.id}/votar`, {method:'POST', body: JSON.stringify({autor: currentAutor})});
+      const idx = destinosCache.findIndex(x=>x.id===d.id);
+      destinosCache[idx] = d;
+      renderDestinos();
+    });
+  });
+}
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderDestinos();
+  });
+});
+
+// ---------- mural ----------
+function linkify(text){
+  const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return escaped.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+}
+function timeAgo(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+}
+async function loadMural(){
+  const items = await api('/mural');
+  const list = document.getElementById('muralList');
+  list.innerHTML = '';
+  if(items.length===0){
+    list.innerHTML = '<p class="empty-hint">Ninguém postou nada ainda. Bora quebrar o gelo?</p>';
+    return;
+  }
+  items.forEach(item=>{
+    const el = document.createElement('div');
+    el.className = 'mural-item';
+    el.innerHTML = `
+      <div class="meta">
+        <span class="autor-tag">${item.autor}</span>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="time">${timeAgo(item.created_at)}</span>
+          <button class="del" data-id="${item.id}">remover</button>
+        </div>
+      </div>
+      <div class="conteudo">${linkify(item.conteudo)}</div>
+      <div class="comments" id="comments-${item.id}">
+        ${item.comentarios.map(c=>`<div class="comment"><b>${c.autor}:</b> ${c.texto}</div>`).join('')}
+        <div class="comment-form">
+          <input type="text" placeholder="Comentar..." data-id="${item.id}">
+          <button data-id="${item.id}">Enviar</button>
+        </div>
+      </div>`;
+    list.appendChild(el);
+  });
+  list.querySelectorAll('.del').forEach(b=>b.addEventListener('click', async ()=>{
+    await api(`/mural/${b.dataset.id}`, {method:'DELETE'});
+    loadMural();
+  }));
+  list.querySelectorAll('.comment-form button').forEach(b=>b.addEventListener('click', async ()=>{
+    if(!currentAutor){ alert('Escolhe quem você é lá em cima primeiro'); return; }
+    const input = list.querySelector(`.comment-form input[data-id="${b.dataset.id}"]`);
+    const texto = input.value.trim();
+    if(!texto) return;
+    await api(`/mural/${b.dataset.id}/comentarios`, {method:'POST', body: JSON.stringify({autor: currentAutor, texto})});
+    loadMural();
+  }));
+}
+document.getElementById('muralSubmit').addEventListener('click', async ()=>{
+  const input = document.getElementById('muralInput');
+  const conteudo = input.value.trim();
+  if(!conteudo || !currentAutor) return;
+  await api('/mural', {method:'POST', body: JSON.stringify({autor: currentAutor, conteudo})});
+  input.value = '';
+  loadMural();
+});
+
+// ---------- checklist ----------
+async function loadChecklist(){
+  const items = await api('/checklist');
+  const list = document.getElementById('checklistList');
+  list.innerHTML = '';
+  items.forEach(item=>{
+    const row = document.createElement('div');
+    row.className = 'check-row' + (item.feito ? ' done' : '');
+    row.innerHTML = `
+      <button class="checkbox ${item.feito?'checked':''}" data-id="${item.id}">
+        <svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 6"/></svg>
+      </button>
+      <span>${item.texto}</span>
+      <button class="del" data-id="${item.id}">remover</button>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('.checkbox').forEach(cb=>cb.addEventListener('click', async ()=>{
+    const done = !cb.classList.contains('checked');
+    await api(`/checklist/${cb.dataset.id}`, {method:'PATCH', body: JSON.stringify({feito: done})});
+    loadChecklist();
+  }));
+  list.querySelectorAll('.del').forEach(b=>b.addEventListener('click', async ()=>{
+    await api(`/checklist/${b.dataset.id}`, {method:'DELETE'});
+    loadChecklist();
+  }));
+}
+document.getElementById('checklistSubmit').addEventListener('click', async ()=>{
+  const input = document.getElementById('checklistInput');
+  const texto = input.value.trim();
+  if(!texto) return;
+  await api('/checklist', {method:'POST', body: JSON.stringify({texto, criado_por: currentAutor})});
+  input.value = '';
+  loadChecklist();
+});
+
+// ---------- calculadora ----------
+const budget = document.getElementById('budget');
+const income = document.getElementById('income');
+const weddingDate = document.getElementById('weddingDate');
+const budgetLabel = document.getElementById('budgetLabel');
+const incomeLabel = document.getElementById('incomeLabel');
+const monthlyAmount = document.getElementById('monthlyAmount');
+const monthsInfo = document.getElementById('monthsInfo');
+const incomePct = document.getElementById('incomePct');
+const saveDot = document.getElementById('saveDot');
+const fmt = n => n.toLocaleString('pt-BR', {maximumFractionDigits:0});
+
+function monthsBetween(today, target){
+  let months = (target.getFullYear()-today.getFullYear())*12 + (target.getMonth()-today.getMonth());
+  if(target.getDate() < today.getDate()) months -= 1;
+  return Math.max(months, 1);
+}
+function recalc(){
+  const b = parseInt(budget.value);
+  const inc = parseInt(income.value);
+  const today = new Date();
+  const target = new Date(weddingDate.value);
+  const months = monthsBetween(today, target);
+  const monthly = b / months;
+  const pct = (monthly / inc) * 100;
+
+  budgetLabel.textContent = 'R$ ' + fmt(b);
+  incomeLabel.textContent = 'R$ ' + fmt(inc);
+  monthlyAmount.innerHTML = 'R$ ' + fmt(Math.round(monthly)) + '<span class="per"> /mês</span>';
+  monthsInfo.innerHTML = 'Faltam <b>' + months + ' meses</b> até a data escolhida.';
+  incomePct.innerHTML = pct <= 15
+    ? 'Isso equivale a <b>' + pct.toFixed(1) + '%</b> da renda combinada — meta bem tranquila.'
+    : (pct <= 25
+      ? 'Isso equivale a <b>' + pct.toFixed(1) + '%</b> da renda combinada — dá pra guardar com disciplina.'
+      : 'Isso equivale a <b>' + pct.toFixed(1) + '%</b> da renda combinada — talvez valha esticar o prazo ou reduzir o orçamento.');
+}
+let saveTimeout;
+function scheduleSave(){
+  clearTimeout(saveTimeout);
+  saveDot.style.display = 'inline-block';
+  saveTimeout = setTimeout(async ()=>{
+    await api('/orcamento', {method:'PUT', body: JSON.stringify({
+      orcamento_total: parseInt(budget.value),
+      renda_combinada: parseInt(income.value),
+      data_casamento: weddingDate.value,
+    })});
+    saveDot.style.display = 'none';
+  }, 700);
+}
+[budget, income, weddingDate].forEach(el => el.addEventListener('input', ()=>{recalc(); scheduleSave();}));
+
+async function loadOrcamento(){
+  const cfg = await api('/orcamento');
+  budget.value = cfg.orcamento_total;
+  income.value = cfg.renda_combinada;
+  weddingDate.value = cfg.data_casamento;
+  recalc();
+}
+
+// ---------- boot ----------
+loadDestinos();
+loadMural();
+loadChecklist();
+loadOrcamento();
+</script>
+
+</body>
+</html>
