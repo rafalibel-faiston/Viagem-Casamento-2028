@@ -215,13 +215,11 @@ def criar_destino(payload: schemas.DestinoIn, db: Session = Depends(get_db)):
 
 
 @app.delete("/api/destinos/{destino_id}")
-def deletar_destino(destino_id: int, autor: str, db: Session = Depends(get_db)):
+def deletar_destino(destino_id: int, autor: str | None = None, db: Session = Depends(get_db)):
     destino = db.get(models.Destino, destino_id)
     if not destino:
         raise HTTPException(404, "Destino não encontrado")
-    if destino.criado_por != autor:
-        raise HTTPException(403, "Só quem sugeriu esse destino pode removê-lo")
-    db.delete(destino)
+    db.delete(destino)  # cascata apaga votos e custos junto
     db.commit()
     return {"ok": True}
 

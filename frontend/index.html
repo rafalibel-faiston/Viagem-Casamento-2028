@@ -627,7 +627,7 @@ function renderDestinos(){
         </div>
         <div class="card-actions">
           <button class="link-btn custos-toggle" data-id="${d.id}">${isOpen ? 'esconder custos' : 'detalhar custos'}</button>
-          ${d.criado_por && d.criado_por===currentAutor ? `<button class="link-btn danger del-destino" data-id="${d.id}">remover sugestão</button>` : ''}
+          <button class="link-btn danger del-destino" data-id="${d.id}">excluir destino</button>
         </div>
         <div class="custos-box" id="custos-${d.id}" style="display:${isOpen ? 'block' : 'none'};">
           <div class="custo-open-title">Quanto o casal gasta (R$)</div>
@@ -661,9 +661,9 @@ function renderDestinos(){
   });
   wrap.querySelectorAll('.del-destino').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
-      if(!currentAutor) return;
-      if(!confirm('Remover essa sugestão de destino?')) return;
-      await api(`/destinos/${btn.dataset.id}?autor=${encodeURIComponent(currentAutor)}`, {method:'DELETE'});
+      if(!confirm('Excluir esse destino? Isso apaga os votos e os custos dele também.')) return;
+      const q = currentAutor ? `?autor=${encodeURIComponent(currentAutor)}` : '';
+      await api(`/destinos/${btn.dataset.id}${q}`, {method:'DELETE'});
       destinosCache = destinosCache.filter(x=>x.id!==parseInt(btn.dataset.id));
       renderDestinos();
     });
